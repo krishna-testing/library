@@ -9,15 +9,18 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "User")
+@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "users") // Use plural for table naming convention
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private String name;
     private Long contactNumber;
     private String collegeName;
     private String email;
     private String gender;
     private String password;
+
 }
