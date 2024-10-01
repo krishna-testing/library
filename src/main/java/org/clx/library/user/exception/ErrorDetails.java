@@ -1,8 +1,9 @@
-package org.clx.library.exception;
+package org.clx.library.user.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 

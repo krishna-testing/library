@@ -1,6 +1,6 @@
-package org.clx.library.repository;
+package org.clx.library.user.repository;
 
-import org.clx.library.model.User;
+import org.clx.library.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

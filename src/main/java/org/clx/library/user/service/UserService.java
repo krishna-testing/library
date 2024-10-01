@@ -1,6 +1,6 @@
-package org.clx.library.service;
+package org.clx.library.user.service;
 
-import org.clx.library.model.User;
+import org.clx.library.user.model.User;
 import org.springframework.stereotype.Service;
 
 @Service

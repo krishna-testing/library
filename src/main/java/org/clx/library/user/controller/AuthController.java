@@ -1,22 +1,23 @@
-package org.clx.library.controller;
+package org.clx.library.user.controller;
 
 import lombok.AllArgsConstructor;
-import org.clx.library.config.JwtProvider;
-
-import org.clx.library.exception.EmailAlreadyUsedException;
-import org.clx.library.model.User;
-import org.clx.library.repository.UserRepository;
-import org.clx.library.request.LoginRequest;
-import org.clx.library.response.AuthResponse;
-import org.clx.library.service.CustomUserDetailsService;
-import org.clx.library.service.UserService;
+import org.clx.library.user.config.JwtProvider;
+import org.clx.library.user.model.User;
+import org.clx.library.user.repository.UserRepository;
+import org.clx.library.user.request.LoginRequest;
+import org.clx.library.user.response.AuthResponse;
+import org.clx.library.user.service.CustomUserDetailsService;
+import org.clx.library.user.service.UserService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
@@ -54,7 +55,7 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public AuthResponse signin( @RequestBody LoginRequest loginRequest) {
+    public AuthResponse signin(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticate(loginRequest.getEmail(), loginRequest.getPassword());
         String token = JwtProvider.generateToken(authentication);
 
@@ -72,4 +73,3 @@ public class AuthController {
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }
-

@@ -96,7 +96,7 @@ public class BookController {
         try {
             bookService.deleteBookById(id);
             ApiResponse<Void> response = new ApiResponse<>(true, null, "Book deleted successfully.", HttpStatus.NO_CONTENT,null);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response); // Return 204 No Content after deletion
+            return ResponseEntity.status(HttpStatus.OK).body(response); // Return 204 No Content after deletion
         } catch (Exception e) {
             ApiResponse<Void> response = new ApiResponse<>(false, null, "Book not found.", HttpStatus.NOT_FOUND,null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response); // Return 404 Not Found if book doesn't exist

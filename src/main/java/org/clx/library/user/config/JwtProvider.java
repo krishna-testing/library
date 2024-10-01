@@ -1,4 +1,4 @@
-package org.clx.library.config;
+package org.clx.library.user.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

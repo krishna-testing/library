@@ -1,4 +1,4 @@
-package org.clx.library.config;
+package org.clx.library.user.config;
 
 public class JwtConstants {
     public static String JWT_HEADER = "Authorization";

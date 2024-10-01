@@ -1,8 +1,8 @@
-package org.clx.library.service;
+package org.clx.library.user.service;
 
 import lombok.AllArgsConstructor;
-import org.clx.library.model.User;
-import org.clx.library.repository.UserRepository;
+import org.clx.library.user.model.User;
+import org.clx.library.user.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -1,4 +1,4 @@
-package org.clx.library.model;
+package org.clx.library.user.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "users") // Use plural for table naming convention
 public class User {
     @Id

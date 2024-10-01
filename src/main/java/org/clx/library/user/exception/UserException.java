@@ -1,4 +1,4 @@
-package org.clx.library.exception;
+package org.clx.library.user.exception;
 
 public class UserException extends Exception{
     public UserException(String message){
