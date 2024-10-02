@@ -2,10 +2,12 @@ package org.clx.library.user.controller;
 
 import lombok.AllArgsConstructor;
 import org.clx.library.user.config.JwtProvider;
+import org.clx.library.user.model.Admin;
 import org.clx.library.user.model.User;
 import org.clx.library.user.repository.UserRepository;
 import org.clx.library.user.request.LoginRequest;
 import org.clx.library.user.response.AuthResponse;
+import org.clx.library.user.service.AminService;
 import org.clx.library.user.service.CustomUserDetailsService;
 import org.clx.library.user.service.UserService;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,34 +26,35 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 @Validated
 public class AuthController {
-    private final UserService userService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailsService userDetailsService;
 
     @PostMapping("/signup")
-    public AuthResponse createUser(@RequestBody User user) throws Exception {
-        User isExist = userRepository.findByEmail(user.getEmail());
-        if (isExist != null){
-            throw new Exception("This email is already used with another account");
-        }
-        User newUser = new User();
+    public AuthResponse createUser(@RequestBody User user, @RequestBody Admin admin) throws Exception {
 
-        newUser.setName(user.getName());
-        newUser.setEmail(user.getEmail());
-        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        newUser.setContactNumber(user.getContactNumber());
-        newUser.setCollegeName(user.getCollegeName());
-        newUser.setGender(user.getGender());
+            User isExist = userRepository.findByEmail(user.getEmail());
+            if (isExist != null) {
+                throw new Exception("This email is already used with another account");
+            }
+            User newUser = new User();
 
-        User savedUser = userRepository.save(newUser);
+            newUser.setName(user.getName());
+            newUser.setEmail(user.getEmail());
+            newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            newUser.setContactNumber(user.getContactNumber());
+            newUser.setCollegeName(user.getCollegeName());
+            newUser.setGender(user.getGender());
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(savedUser.getPassword(), savedUser.getEmail());
-        String token = JwtProvider.generateToken(authentication);
+            User savedUser = userRepository.save(newUser);
 
-        AuthResponse res = new AuthResponse(token, "Register Success");
+            Authentication authentication = new UsernamePasswordAuthenticationToken(savedUser.getPassword(), savedUser.getEmail());
+            String token = JwtProvider.generateToken(authentication);
 
-        return res;
+            AuthResponse res = new AuthResponse(token, "Register Success");
+
+            return res;
+
     }
 
     @PostMapping("/signin")
