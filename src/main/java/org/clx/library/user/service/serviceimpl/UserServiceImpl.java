@@ -40,8 +40,6 @@ public class UserServiceImpl implements UserService {
 
         return savedUser;
     }
-
-
     @Override
     public User findUserByJwt(String jwt) {
         logger.info("Finding user by JWT: {}", jwt);
