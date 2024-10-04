@@ -1,4 +1,4 @@
-package org.clx.library.book.errorhandling;
+package org.clx.library.bookabhay.errorhandling;
 
 import lombok.Data;
 

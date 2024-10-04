@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/auth")
@@ -49,7 +51,7 @@ public class AuthController {
         Authentication authentication = new UsernamePasswordAuthenticationToken(savedUser.getPassword(), savedUser.getEmail());
         String token = JwtProvider.generateToken(authentication);
 
-        AuthResponse res = new AuthResponse(token, "Register Success");
+        AuthResponse res = new AuthResponse(token, "Register Success", LocalDateTime.now());
 
         return res;
     }
@@ -59,7 +61,12 @@ public class AuthController {
         Authentication authentication = authenticate(loginRequest.getEmail(), loginRequest.getPassword());
         String token = JwtProvider.generateToken(authentication);
 
-        return new AuthResponse(token, "Login Success");
+        return new AuthResponse(token, "Login Success", LocalDateTime.now());
+    }
+    @PostMapping("/logout")
+    public AuthResponse logout() {
+        // In this case, the client should remove the token from its local storage.
+        return new AuthResponse(null, "Logout Success", LocalDateTime.now());
     }
 
     private Authentication authenticate(String email, String password) {

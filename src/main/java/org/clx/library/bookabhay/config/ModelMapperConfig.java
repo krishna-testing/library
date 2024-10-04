@@ -1,4 +1,4 @@
-package org.clx.library.book.config;
+package org.clx.library.bookabhay.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

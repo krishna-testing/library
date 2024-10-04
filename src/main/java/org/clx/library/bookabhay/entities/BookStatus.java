@@ -1,4 +1,4 @@
-package org.clx.library.book.entities;
+package org.clx.library.bookabhay.entities;
 
 enum BookStatus {
     AVAILABLE,
