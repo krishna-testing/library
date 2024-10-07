@@ -1,6 +1,6 @@
-//package org.clx.library.book.repositories;
+//package org.clx.library.bookabhay.repositories;
 //
-//import org.clx.library.book.entities.Author;
+//import org.clx.library.bookabhay.entities.Author;
 //import org.springframework.data.jpa.repository.JpaRepository;
 //import org.springframework.stereotype.Repository;
 //

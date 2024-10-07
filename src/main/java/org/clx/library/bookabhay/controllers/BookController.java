@@ -31,6 +31,7 @@ public class BookController {
         String message = bookService.deleteBook(bookId, reqUser.getId());
         ApiResponse res = new ApiResponse(message, true);
         return new ResponseEntity<ApiResponse>(res, HttpStatus.OK);
+
     }
     @GetMapping("/{bookId}")
     public ResponseEntity<Book> findBookByIdHandler(@PathVariable Integer bookId) throws Exception {

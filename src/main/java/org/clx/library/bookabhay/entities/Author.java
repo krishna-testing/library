@@ -1,14 +1,16 @@
-//package org.clx.library.book.entities;
+//package org.clx.library.bookabhay.entities;
 //
 //import com.fasterxml.jackson.annotation.JsonIgnore;
 //import jakarta.persistence.*;
 //import lombok.Data;
+//import lombok.RequiredArgsConstructor;
 //
 //import java.util.List;
 //
 //
 //@Entity
 //@Data
+//@RequiredArgsConstructor
 //public class Author {
 //    @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)

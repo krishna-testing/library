@@ -9,6 +9,7 @@ import org.clx.library.bookabhay.entities.Book;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 // Use plural for table naming convention
 @Entity
@@ -30,4 +31,7 @@ public class User {
     @ManyToMany
     @JsonIgnore
     private List<Book> savedPost = new ArrayList<>();
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles;
 }

@@ -1,8 +1,10 @@
-//package org.clx.library.book.service;
+//package org.clx.library.bookabhay.service;
 //
-//import org.clx.library.book.entities.Author;
+//import org.clx.library.bookabhay.entities.Author;
+//import org.springframework.stereotype.Service;
+//
 //import java.util.List;
-//
+//@Service
 //public interface AuthorService {
 //    Author saveAuthor(Author author);
 //    Author updateAuthor(Author author);

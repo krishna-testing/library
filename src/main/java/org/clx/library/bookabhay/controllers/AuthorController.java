@@ -1,7 +1,8 @@
-//package org.clx.library.book.controllers;
+//package org.clx.library.bookabhay.controllers;
 //
-//import org.clx.library.book.entities.Author;
-//import org.clx.library.book.service.AuthorService;
+//import lombok.RequiredArgsConstructor;
+//import org.clx.library.bookabhay.entities.Author;
+//import org.clx.library.bookabhay.service.AuthorService;
 //import org.springframework.http.HttpStatus;
 //import org.springframework.http.ResponseEntity;
 //import org.springframework.web.bind.annotation.*;
@@ -10,13 +11,10 @@
 //
 //@RestController
 //@RequestMapping("/api/authors")
+//@RequiredArgsConstructor
 //public class AuthorController {
-//
 //    private final AuthorService authorService;
 //
-//    public AuthorController(AuthorService authorService) {
-//        this.authorService = authorService;
-//    }
 //
 //    @PostMapping
 //    public ResponseEntity<Author> createAuthor(@RequestBody Author author) {

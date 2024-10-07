@@ -1,9 +1,8 @@
-//package org.clx.library.book.service.ServieImpl;
+//package org.clx.library.bookabhay.service.ServieImpl;
 //
-//
-//import org.clx.library.book.entities.Author;
-//import org.clx.library.book.repositories.AuthorRepository;
-//import org.clx.library.book.service.AuthorService;
+//import org.clx.library.bookabhay.entities.Author;
+//import org.clx.library.bookabhay.repositories.AuthorRepository;
+//import org.clx.library.bookabhay.service.AuthorService;
 //import org.springframework.stereotype.Service;
 //import java.util.List;
 //
