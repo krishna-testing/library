@@ -14,11 +14,11 @@ public class Book {
     private Integer id;
     private String title;
     private String ISBN;
-//    @ManyToOne
-//    private Author author;
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "book_status")
-//    private BookStatus status;
+    @ManyToOne
+    private Author author;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "book_status")
+    private BookStatus status;
     private LocalDateTime createdAt;
 
     @ManyToOne
