@@ -34,7 +34,7 @@ public class BookServiceImpl implements BookService {
         Book newBook = new Book();
         newBook.setISBN(book.getISBN());
         newBook.setTitle(book.getTitle());
-        newBook.setStatus(book.getStatus());
+//        newBook.setStatus(book.getStatus());
 //        newBook.setAuthor(book.getAuthor( ));
         newBook.setCreatedAt(LocalDateTime.now());
         newBook.setUser(user);

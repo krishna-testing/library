@@ -24,7 +24,7 @@ public class JwtValidator extends OncePerRequestFilter {
                 Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
-//                logger.error("JWT validation failed: {}", e.getMessage());
+//                logger.error("JWT validation failed: {}",z e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Invalid token.");
                 return;

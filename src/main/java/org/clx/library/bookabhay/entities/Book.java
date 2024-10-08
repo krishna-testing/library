@@ -16,9 +16,9 @@ public class Book {
     private String ISBN;
 //    @ManyToOne
 //    private Author author;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "book_status")
-    private BookStatus status;
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "book_status")
+//    private BookStatus status;
     private LocalDateTime createdAt;
 
     @ManyToOne

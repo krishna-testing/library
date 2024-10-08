@@ -25,35 +25,37 @@ public class BookController {
         Book createdBook = bookService.createBook(book, reqUser.getId());
         return new ResponseEntity<>(createdBook, HttpStatus.ACCEPTED);
     }
+
     @DeleteMapping("/{bookId}")
     public ResponseEntity<ApiResponse> deletePost(@RequestHeader("Authorization") String jwt, @PathVariable Integer bookId) throws Exception {
         User reqUser = userService.findUserByJwt(jwt);
         String message = bookService.deleteBook(bookId, reqUser.getId());
         ApiResponse res = new ApiResponse(message, true);
         return new ResponseEntity<ApiResponse>(res, HttpStatus.OK);
-
     }
+
     @GetMapping("/{bookId}")
     public ResponseEntity<Book> findBookByIdHandler(@PathVariable Integer bookId) throws Exception {
         Book book = bookService.findBookById(bookId);
         return new ResponseEntity<>(book, HttpStatus.ACCEPTED);
     }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Book>> findUsersBook(@PathVariable Integer userId) {
         List<Book> books = bookService.findBookByUserId(userId);
         return new ResponseEntity<List<Book>>(books, HttpStatus.OK);
     }
+
     @GetMapping()
     public ResponseEntity<List<Book>> findAllBook() {
         List<Book> books = bookService.getAllBooks();
         return new ResponseEntity<List<Book>>(books, HttpStatus.OK);
     }
+
     @PutMapping("/save/{bookId}")
     public ResponseEntity<Book> savedBookIdHandler(@RequestHeader("Authorization") String jwt, @PathVariable Integer bookId) throws Exception {
         User reqUser = userService.findUserByJwt(jwt);
-
         Book book = bookService.savedBook(bookId, reqUser.getId());
         return new ResponseEntity<Book>(book, HttpStatus.ACCEPTED);
     }
-
 }
