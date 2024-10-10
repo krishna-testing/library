@@ -3,6 +3,7 @@ package org.clx.library.bookabhay.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.clx.library.user.model.User;
+import org.springframework.util.StreamUtils;
 
 import java.time.LocalDateTime;
 
@@ -21,6 +22,7 @@ public class Book {
     private BookStatus status;
     private LocalDateTime createdAt;
 
+    private StreamUtils utils;
     @ManyToOne
     private User user;
 }

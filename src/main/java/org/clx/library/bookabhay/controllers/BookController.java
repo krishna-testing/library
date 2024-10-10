@@ -24,6 +24,7 @@ public class BookController {
         User reqUser = userService.findUserByJwt(jwt);
         Book createdBook = bookService.createBook(book, reqUser.getId());
         return new ResponseEntity<>(createdBook, HttpStatus.ACCEPTED);
+
     }
 
     @DeleteMapping("/{bookId}")
@@ -40,9 +41,11 @@ public class BookController {
         return new ResponseEntity<>(book, HttpStatus.ACCEPTED);
     }
 
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Book>> findUsersBook(@PathVariable Integer userId) {
         List<Book> books = bookService.findBookByUserId(userId);
+
         return new ResponseEntity<List<Book>>(books, HttpStatus.OK);
     }
 
