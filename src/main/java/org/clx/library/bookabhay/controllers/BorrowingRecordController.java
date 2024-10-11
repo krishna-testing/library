@@ -44,9 +44,3 @@
 //        return new ResponseEntity<>(updatedRecord, HttpStatus.OK);
 //    }
 //
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deleteBorrowingRecord(@PathVariable Integer id) {
-//        borrowingRecordService.deleteBorrowingRecord(id);
-//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//    }
-//}

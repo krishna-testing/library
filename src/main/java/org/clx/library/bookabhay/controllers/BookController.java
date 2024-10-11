@@ -24,7 +24,6 @@ public class BookController {
         User reqUser = userService.findUserByJwt(jwt);
         Book createdBook = bookService.createBook(book, reqUser.getId());
         return new ResponseEntity<>(createdBook, HttpStatus.ACCEPTED);
-
     }
 
     @DeleteMapping("/{bookId}")
