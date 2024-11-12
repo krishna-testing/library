@@ -38,10 +38,15 @@ public class StudentService {
     }
 
 
-    public void deleteStudent(int id ){
+    public void deleteStudent(int id){
 
         cardService.deactivate(id);
         studentRepository.deleteCustom(id);
 
+    }
+
+    public Student getStudentById(int studentId) {
+        Student student = studentRepository.findById(studentId).get();
+        return student;
     }
 }

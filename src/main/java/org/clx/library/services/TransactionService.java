@@ -40,7 +40,7 @@ public class TransactionService {
 
         // Use findById() and check if the book exists
         Optional<Book> optionalBook = bookRepository.findById(bookId);
-        if (!optionalBook.isPresent()) {
+        if (optionalBook.isEmpty()) {
             throw new Exception("Book not found!!");
         }
 

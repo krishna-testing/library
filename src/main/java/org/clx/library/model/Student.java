@@ -38,16 +38,19 @@ public class Student {
     @UpdateTimestamp
     private Date updatedOn;
 
+
+    public Student(){
+    }
+
+    public Student(String name, String emailId) {
+        this.name = name;
+        this.emailId = emailId;
+    }
+
     public Student(String emailId, String name, int age, String country) {
         this.emailId = emailId;
         this.name = name;
         this.age = age;
         this.country = country;
     }
-
-    public Student(){
-
-    }
-
-
 }

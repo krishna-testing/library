@@ -33,12 +33,8 @@ public class StudentController {
     }
 
 
-
-
-
-
-
-
-
-
+    public ResponseEntity<Student> getStudentById(int studentId) {
+        Student student=studentService.getStudentById(studentId);
+        return new ResponseEntity<>(student,HttpStatus.OK);
+    }
 }

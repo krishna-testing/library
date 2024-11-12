@@ -18,19 +18,28 @@ public class TransactionController {
 
     //what i need ideally is card_id and book_id
 
+    // Issue Book Endpoint
     @PostMapping("/issueBook")
     public ResponseEntity<String> issueBook(@RequestParam(value = "cardId") int cardId,
-                                            @RequestParam("bookId")int bookId) throws Exception {
-        String transaction_id=transactionService.issueBooks(cardId,bookId);
-        return new ResponseEntity<>("Your Transaction was successfull here is your Txn id:"+transaction_id, HttpStatus.OK);
-
+                                            @RequestParam("bookId") int bookId) {
+        try {
+            String transactionId = transactionService.issueBooks(cardId, bookId);
+            return new ResponseEntity<>("Your Transaction was successful. Here is your Txn ID: " + transactionId, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     @PostMapping("/returnBook")
     public ResponseEntity<String> returnBook(@RequestParam("cardId") int cardId,
                                      @RequestParam("bookId") int bookId) throws Exception {
-        String transaction_id=transactionService.returnBooks(cardId,bookId);
-        return new ResponseEntity<>(
-                "Your Transaction was Successful here is your Txn id:"+transaction_id,HttpStatus.OK);
+        try{
+            String transaction_id=transactionService.returnBooks(cardId,bookId);
+            return new ResponseEntity<>(
+                    "Your Transaction was Successful here is your Txn id:"+transaction_id,HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
 
     }
 }

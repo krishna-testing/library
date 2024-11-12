@@ -46,4 +46,8 @@ public class Card {
     }
 
 
+    public Card(Student student, String active) {
+        this.student=student;
+        this.cardStatus=CardStatus.ACTIVATED;
+    }
 }
