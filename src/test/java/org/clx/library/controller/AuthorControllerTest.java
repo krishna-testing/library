@@ -27,7 +27,7 @@ public class AuthorControllerTest {
 
     @Test
     public void createAuthorTest() throws Exception {
-        Author author = new Author("John Doe", "john.doe@example.com", 45, "USA");
+        Author author = new Author(1,"John Doe", "john.doe@example.com", 45, "USA",null);
 
         mockMvc = MockMvcBuilders.standaloneSetup(authorController).build();
         doNothing().when(authorService).createAuthor(any(Author.class));
@@ -43,7 +43,6 @@ public class AuthorControllerTest {
 
     @Test
     public void updateAuthorTest() throws Exception {
-        Author author = new Author("Jane Doe", "jane.doe@example.com", 35, "Canada");
 
         mockMvc = MockMvcBuilders.standaloneSetup(authorController).build();
         doNothing().when(authorService).updateAuthor(any(Author.class));

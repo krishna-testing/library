@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 @Transactional
 public interface AuthorRepository extends JpaRepository<Author,Integer> {
     @Modifying
@@ -19,4 +21,5 @@ public interface AuthorRepository extends JpaRepository<Author,Integer> {
     @Modifying
     @Query("delete Author a where a.id=:given_id")
     int deleteCustom(@Param("given_id") int id);
+
 }

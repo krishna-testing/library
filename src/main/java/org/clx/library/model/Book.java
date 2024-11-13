@@ -2,13 +2,14 @@ package org.clx.library.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Setter
-@Getter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,6 +20,7 @@ public class Book {
 
     @Enumerated(EnumType.STRING)
     private Genre genre;
+    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn
@@ -33,20 +35,9 @@ public class Book {
     @Column(columnDefinition = "TINYINT(1)")
     private boolean available;
 
-    @OneToMany(mappedBy = "book",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Transaction> transactions;
-
-    public Book(){
-
-    }
-
-    public Book( String name, Genre genre,Author author) {
-        this.name = name;
-        this.genre = genre;
-        this.author=author;
-        this.available =true;
-    }
 
     public boolean getAvailable() {
         return available;
