@@ -10,20 +10,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class CardService {
 
-
     @Autowired
-    CardRepository cardRepository;
+    private CardRepository cardRepository;
 
-
-    public Card createCard(Student student){
-        Card card =new Card();
-        student.setCard(card);
+    public Card createCard(Student student) {
+        Card card = new Card();
         card.setStudent(student);
+        card.setCardStatus(CardStatus.ACTIVATED); // Explicitly setting card status
+        student.setCard(card);  // Establishing bi-directional relationship
         cardRepository.save(card);
         return card;
     }
-    public void deactivate(int student_id){
-        cardRepository.deactivateCard(student_id, CardStatus.DEACTIVATED.toString());
 
+    public void deactivate(int studentId) {
+        cardRepository.deactivateCard(studentId, CardStatus.DEACTIVATED.toString());
     }
 }

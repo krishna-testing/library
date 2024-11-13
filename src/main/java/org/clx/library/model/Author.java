@@ -22,11 +22,10 @@ public class Author {
     private int age;
     private String country;
 
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Book> booksWritten;
 
-    @OneToMany(mappedBy = "author",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<Book> books_written;
-
-    public Author(){}
+    public Author() {}
 
     public Author(String name, String email, int age, String country) {
         this.name = name;
@@ -34,5 +33,4 @@ public class Author {
         this.age = age;
         this.country = country;
     }
-
 }
