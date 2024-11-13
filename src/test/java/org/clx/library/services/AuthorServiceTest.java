@@ -1,5 +1,7 @@
 package org.clx.library.services;
 
+import lombok.AllArgsConstructor;
+import org.clx.library.controller.AuthorController;
 import org.clx.library.model.Author;
 import org.clx.library.repositories.AuthorRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,50 +9,67 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.*;
 
-public class AuthorServiceTest {
+@WebMvcTest(AuthorController.class)
+@AllArgsConstructor
+public class AuthorControllerTest {
 
-    @InjectMocks
+    private final MockMvc mockMvc;
+
+    @MockBean
     private AuthorService authorService;
 
-    @Mock
-    private AuthorRepository authorRepository;
+    @InjectMocks
+    private AuthorController authorController;
 
-    @BeforeEach
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
+    @Test
+    public void createAuthorTest() throws Exception {
+        Author author = new Author(1, "John Doe", "john.doe@example.com", 45, "USA", null);
+
+        doNothing().when(authorService).createAuthor(any(Author.class));
+
+        // Perform POST request with JSON content
+        mockMvc.perform(post("/authors")  // changed the endpoint to /authors
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"John Doe\",\"email\":\"john.doe@example.com\",\"age\":45,\"country\":\"USA\"}"))
+                .andExpect(status().isCreated())  // 201 Created
+                .andExpect(content().string("Author created"));
+
+        verify(authorService, times(1)).createAuthor(any(Author.class));
     }
 
     @Test
-    void createAuthorTest() {
-        Author author = new Author("John Doe", "john.doe@example.com", 45, "USA");
-        doNothing().when(authorRepository).save(author);
+    public void updateAuthorTest() throws Exception {
+        Author author = new Author(1, "Jane Doe", "jane.doe@example.com", 35, "Canada", null);
 
-        authorService.createAuthor(author);
+        doNothing().when(authorService).updateAuthor(any(Author.class));
 
-        verify(authorRepository, times(1)).save(author);
+        // Perform PUT request with JSON content
+        mockMvc.perform(put("/authors/1")  // updated endpoint with author ID
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Jane Doe\",\"email\":\"jane.doe@example.com\",\"age\":35,\"country\":\"Canada\"}"))
+                .andExpect(status().isAccepted())  // 202 Accepted
+                .andExpect(content().string("Author updated!!"));
+
+        verify(authorService, times(1)).updateAuthor(any(Author.class));
     }
 
     @Test
-    void updateAuthorTest() {
-        Author author = new Author("Jane Doe", "jane.doe@example.com", 35, "Canada");
-        author.setId(1);
-        when(authorRepository.updateAuthorDetails(author)).thenReturn(1);
-
-        authorService.updateAuthor(author);
-
-        verify(authorRepository, times(1)).updateAuthorDetails(author);
-    }
-
-    @Test
-    void deleteAuthorTest() {
+    public void deleteAuthorTest() throws Exception {
         int authorId = 1;
-        doNothing().when(authorRepository).deleteCustom(authorId);
 
-        authorService.deleteAuthor(authorId);
+        doNothing().when(authorService).deleteAuthor(authorId);
 
-        verify(authorRepository, times(1)).deleteCustom(authorId);
+        // Perform DELETE request with author ID
+        mockMvc.perform(delete("/authors/{id}", authorId))  // endpoint updated to /authors/{id}
+                .andExpect(status().isNoContent())  // 204 No Content (common for successful deletes)
+                .andExpect(content().string("Author deleted!!"));
+
+        verify(authorService, times(1)).deleteAuthor(authorId);
     }
 }

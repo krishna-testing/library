@@ -33,10 +33,10 @@ class BookControllerTest {
     @Test
     void testCreateBook() {
         // Given
-        Book book = new Book("Sample Book", Genre.FICTIONAL, null);
+        Book book = new Book(8,"Sample Book", Genre.FICTIONAL, null,null,true,null);
 
         // When
-        ResponseEntity<String> response = bookController.createBook(book);
+        ResponseEntity<String> response = bookController.createBook(book,null);
 
         // Then
         assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
@@ -48,8 +48,8 @@ class BookControllerTest {
     void testGetBooks_NoFilters() {
         // Given
         List<Book> books = new ArrayList<>();
-        books.add(new Book("Book1", Genre.HISTORY, null));
-        books.add(new Book("Book2", Genre.POLITICAL_SCIENCE, null));
+        books.add(new Book(1,"Book1", Genre.HISTORY, null,null,true,null));
+        books.add(new Book(1,"Book1",  Genre.POLITICAL_SCIENCE, null,null,true,null));
         when(bookService.getBooks(null, false, null)).thenReturn(books);
 
         // When
@@ -66,7 +66,7 @@ class BookControllerTest {
         // Given
         String genre = "FICTIONAL";
         List<Book> books = new ArrayList<>();
-        books.add(new Book("Fictional Book", Genre.FICTIONAL, null));
+        books.add(new Book(2,"Fictional Book", Genre.FICTIONAL, null,null,true,null));
         when(bookService.getBooks(genre, false, null)).thenReturn(books);
 
         // When
@@ -83,7 +83,7 @@ class BookControllerTest {
     void testGetBooks_WithAvailability() {
         // Given
         List<Book> books = new ArrayList<>();
-        books.add(new Book("Available Book", Genre.CHEMISTRY, null));
+        books.add(new Book(1,"Available Book", Genre.CHEMISTRY, null,null,true,null));
         when(bookService.getBooks(null, true, null)).thenReturn(books);
 
         // When
@@ -102,7 +102,7 @@ class BookControllerTest {
         String genre = "FICTIONAL";
         String author = "Author Name";
         List<Book> books = new ArrayList<>();
-        books.add(new Book("Fictional Book by Author", Genre.FICTIONAL, null));
+        books.add(new Book(5,"Fictional Book by Author", Genre.FICTIONAL, null, null, true,null));
         when(bookService.getBooks(genre, false, author)).thenReturn(books);
 
         // When

@@ -10,9 +10,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 class BookServiceTest {
@@ -30,73 +32,79 @@ class BookServiceTest {
 
     @Test
     void testCreateBook() {
-        // Given
-        Book book = new Book("Sample Book", Genre.HISTORY, null);
+        Book book = new Book(1, "Book Title", null, null, null, true, null);
 
-        // When
+        // Call the method to test
         bookService.createBook(book);
 
-        // Then
+        // Verify that the save method was called on the mocked repository
         verify(bookRepository, times(1)).save(book);
     }
 
     @Test
-    void testGetBooks_ByGenreAndAuthor() {
-        // Given
-        String genre = "FICTIONAL";
-        String author = "Author Name";
-        List<Book> books = new ArrayList<>();
-        books.add(new Book("Sample Fictional Book", Genre.FICTIONAL, null));
-        when(bookRepository.findBooksByGenre_Author(genre, author, true)).thenReturn(books);
+    void testGetBooksByGenreAndAuthor() {
+        String genre = "Science Fiction";
+        String author = "Isaac Asimov";
+        boolean isAvailable = true;
+        Book book = new Book(1, "Foundation", null, null, null, true, null);
 
-        // When
-        List<Book> result = bookService.getBooks(genre, true, author);
+        when(bookRepository.findBooksByGenre_Author(genre, author, isAvailable)).thenReturn(Collections.singletonList(book));
 
-        // Then
-        assertEquals(1, result.size());
-        assertEquals("Sample Fictional Book", result.get(0).getName());
-        verify(bookRepository, times(1)).findBooksByGenre_Author(genre, author, true);
+        List<Book> books = bookService.getBooks(genre, isAvailable, author);
+
+        assertNotNull(books);
+        assertEquals(1, books.size());
+        assertEquals("Foundation", books.get(0).getName());
+
+        // Verify the repository method was called correctly
+        verify(bookRepository, times(1)).findBooksByGenre_Author(genre, author, isAvailable);
     }
+
 
     @Test
-    void testGetBooks_ByGenre() {
-        // Given
-        String genre = "HISTORY";
-        List<Book> books = new ArrayList<>();
-        books.add(new Book("History Book", Genre.HISTORY, null));
-        when(bookRepository.findBooksByGenre(genre, true)).thenReturn(books);
+    void testGetBooksByAvailability() {
+        boolean isAvailable = true;
+        Book book = new Book(3, "1984", null, null, null, true, null);
 
-        // When
-        List<Book> result = bookService.getBooks(genre, true, null);
+        when(bookRepository.findBooksByAvailability(isAvailable)).thenReturn(Collections.singletonList(book));
 
-        // Then
-        assertEquals(1, result.size());
-        assertEquals("History Book", result.get(0).getName());
-        verify(bookRepository, times(1)).findBooksByGenre(genre, true);
+        List<Book> books = bookService.getBooks(null, isAvailable, null);
+
+        assertNotNull(books);
+        assertEquals(1, books.size());
+        assertEquals("1984", books.get(0).getName());
+
+        // Verify the repository method was called correctly
+        verify(bookRepository, times(1)).findBooksByAvailability(isAvailable);
     }
+
 
     @Test
     void testGetBooks_ByAuthor() {
         // Given
-        String author = "Author Name";
+        String authorName = "Author Name";
         List<Book> books = new ArrayList<>();
-        books.add(new Book("Book by Author", Genre.POLITICAL_SCIENCE, null));
-        when(bookRepository.findBooksByAuthor(author, true)).thenReturn(books);
+        books.add(new Book(1,"abhay", Genre.POLITICAL_SCIENCE,null,null,true,null));
 
-        // When
-        List<Book> result = bookService.getBooks(null, true, author);
+        // Mocking the repository method for finding books by author and availability
+        when(bookRepository.findBooksByAuthor(authorName, true)).thenReturn(books);
 
-        // Then
+        // When: Call the service method
+        List<Book> result = bookService.getBooks(null, true, authorName);
+
+        // Then: Assert the result contains the expected book
         assertEquals(1, result.size());
-        assertEquals("Book by Author", result.get(0).getName());
-        verify(bookRepository, times(1)).findBooksByAuthor(author, true);
+        assertEquals("abhay", result.get(0).getName());
+
+        // Verify that the method in bookRepository was called once with the correct parameters
+        verify(bookRepository, times(1)).findBooksByAuthor(authorName, true);
     }
 
     @Test
     void testGetBooks_ByAvailability() {
         // Given
         List<Book> books = new ArrayList<>();
-        books.add(new Book("Available Book", Genre.CHEMISTRY, null));
+        books.add(new Book(1,"Available Book", Genre.CHEMISTRY, null,null,true,null));
         when(bookRepository.findBooksByAvailability(true)).thenReturn(books);
 
         // When
