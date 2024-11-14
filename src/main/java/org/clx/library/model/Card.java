@@ -1,6 +1,7 @@
 package org.clx.library.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,6 +13,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
+@AllArgsConstructor
 public class Card {
 
 
@@ -41,13 +43,13 @@ public class Card {
 
 
 
-    public Card(){
-        this.cardStatus=CardStatus.ACTIVATED;
+    public Card() {
+        this.cardStatus = CardStatus.ACTIVATED;
     }
 
-
-    public Card(Student student, String active) {
-        this.student=student;
-        this.cardStatus=CardStatus.ACTIVATED;
+    public Card(Student student, CardStatus status) {
+        this.student = student;
+        this.cardStatus = status;
     }
+
 }

@@ -1,14 +1,13 @@
 package org.clx.library.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+
+@Setter
+@Getter
 @Entity
 public class Author {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,13 +22,15 @@ public class Author {
     private int age;
     private String country;
 
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Book> booksWritten;
 
-    @OneToMany(mappedBy = "author",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<Book> books_written;
+    public Author() {}
 
-    @ManyToMany
-    @JsonIgnore
-    private List<Book> savedBook = new ArrayList<>();
-
-
+    public Author(String name, String email, int age, String country) {
+        this.name = name;
+        this.email = email;
+        this.age = age;
+        this.country = country;
+    }
 }
