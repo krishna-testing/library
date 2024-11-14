@@ -21,7 +21,7 @@ public class AuthorController {
         authorService.createAuthor(author);
 
         // Return a response with a success message and the ID of the created Author
-        return new ResponseEntity<>("Author created with ID: ", HttpStatus.CREATED);
+        return new ResponseEntity<>("Author created with ID: "+createdAuthor.getId(), HttpStatus.CREATED);
     }
 
     @PutMapping("/updateAuthor/{authorId}")

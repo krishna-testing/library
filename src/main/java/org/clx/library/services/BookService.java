@@ -2,11 +2,11 @@ package org.clx.library.services;
 
 import lombok.AllArgsConstructor;
 import org.clx.library.exception.AuthorException;
+import org.clx.library.exception.BookNotFoundException;
 import org.clx.library.model.Author;
 import org.clx.library.model.Book;
 import org.clx.library.repositories.AuthorRepository;
 import org.clx.library.repositories.BookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -44,13 +44,14 @@ public class BookService {
         return "Post deleted Successfully";
     }
 
-    public Book findBookById(Integer bookId) throws Exception {
+    public Book findBookById(Integer bookId) {
         Optional<Book> opt = bookRepository.findById(bookId);
-        if (opt.isEmpty()){
-            throw new Exception("Post not Found with this id" +bookId);
+        if (opt.isEmpty()) {
+            throw new BookNotFoundException("Book not found with this id: " + bookId);
         }
         return opt.get();
     }
+
 
     public List<Book> findAllBook() {
         return bookRepository.findAll();

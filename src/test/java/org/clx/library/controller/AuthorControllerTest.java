@@ -5,6 +5,7 @@ import org.clx.library.services.AuthorService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -14,8 +15,9 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@SpringBootTest
 @WebMvcTest(AuthorController.class)
-public class AuthorControllerTest {
+class AuthorControllerTest {
 
     private MockMvc mockMvc;
 
@@ -26,9 +28,7 @@ public class AuthorControllerTest {
     private AuthorController authorController;
 
     @Test
-    public void createAuthorTest() throws Exception {
-        Author author = new Author(1,"John Doe", "john.doe@example.com", 45, "USA",null);
-
+    void createAuthorTest() throws Exception {
         mockMvc = MockMvcBuilders.standaloneSetup(authorController).build();
         doNothing().when(authorService).createAuthor(any(Author.class));
 
@@ -42,8 +42,7 @@ public class AuthorControllerTest {
     }
 
     @Test
-    public void updateAuthorTest() throws Exception {
-
+    void updateAuthorTest() throws Exception {
         mockMvc = MockMvcBuilders.standaloneSetup(authorController).build();
         doNothing().when(authorService).updateAuthor(any(Author.class));
 
@@ -57,7 +56,7 @@ public class AuthorControllerTest {
     }
 
     @Test
-    public void deleteAuthorTest() throws Exception {
+    void deleteAuthorTest() throws Exception {
         mockMvc = MockMvcBuilders.standaloneSetup(authorController).build();
         int authorId = 1;
 

@@ -1,75 +1,178 @@
 package org.clx.library.services;
 
-import lombok.AllArgsConstructor;
-import org.clx.library.controller.AuthorController;
+import org.clx.library.exception.AuthorException;
 import org.clx.library.model.Author;
 import org.clx.library.repositories.AuthorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@WebMvcTest(AuthorController.class)
-@AllArgsConstructor
-public class AuthorControllerTest {
+class AuthorServiceTest {
 
-    private final MockMvc mockMvc;
-
-    @MockBean
-    private AuthorService authorService;
+    @Mock
+    private AuthorRepository authorRepository;
 
     @InjectMocks
-    private AuthorController authorController;
+    private AuthorService authorService;
 
-    @Test
-    public void createAuthorTest() throws Exception {
-        Author author = new Author(1, "John Doe", "john.doe@example.com", 45, "USA", null);
+    private Author author;
 
-        doNothing().when(authorService).createAuthor(any(Author.class));
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
 
-        // Perform POST request with JSON content
-        mockMvc.perform(post("/authors")  // changed the endpoint to /authors
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"John Doe\",\"email\":\"john.doe@example.com\",\"age\":45,\"country\":\"USA\"}"))
-                .andExpect(status().isCreated())  // 201 Created
-                .andExpect(content().string("Author created"));
-
-        verify(authorService, times(1)).createAuthor(any(Author.class));
+        // Initialize the Author object
+        author = new Author();
+        author.setId(1);
+        author.setName("Author Name");
+        author.setEmail("author@example.com");
+        author.setAge(45);
+        author.setCountry("Country");
     }
 
     @Test
-    public void updateAuthorTest() throws Exception {
-        Author author = new Author(1, "Jane Doe", "jane.doe@example.com", 35, "Canada", null);
+    void testCreateAuthor() {
+        // Arrange
+        when(authorRepository.save(Mockito.any(Author.class))).thenReturn(author);
 
-        doNothing().when(authorService).updateAuthor(any(Author.class));
+        // Act
+        Author createdAuthor = authorService.createAuthor(author);
 
-        // Perform PUT request with JSON content
-        mockMvc.perform(put("/authors/1")  // updated endpoint with author ID
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Jane Doe\",\"email\":\"jane.doe@example.com\",\"age\":35,\"country\":\"Canada\"}"))
-                .andExpect(status().isAccepted())  // 202 Accepted
-                .andExpect(content().string("Author updated!!"));
-
-        verify(authorService, times(1)).updateAuthor(any(Author.class));
+        // Assert
+        assertNotNull(createdAuthor);
+        assertEquals("Author Name", createdAuthor.getName());
+        assertEquals("author@example.com", createdAuthor.getEmail());
+        verify(authorRepository, times(1)).save(Mockito.any(Author.class));
     }
 
     @Test
-    public void deleteAuthorTest() throws Exception {
+    void testFindAuthorById_Success() throws AuthorException {
+        // Arrange
+        Integer authorId = 1;
+        when(authorRepository.findById(authorId)).thenReturn(Optional.of(author));
+
+        // Act
+        Author foundAuthor = authorService.findAuthorById(authorId);
+
+        // Assert
+        assertNotNull(foundAuthor);
+        assertEquals(authorId, foundAuthor.getId());
+    }
+
+    @Test
+    void testFindAuthorById_NotFound() {
+        // Arrange
+        Integer authorId = 1;
+        when(authorRepository.findById(authorId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        AuthorException exception = assertThrows(AuthorException.class, () -> {
+            authorService.findAuthorById(authorId);
+        });
+
+        assertEquals("User not exist with userId1", exception.getMessage());
+    }
+
+    @Test
+    void testUpdateAuthor_Success() throws AuthorException {
+        // Arrange
+        Integer authorId = 1;
+        Author updatedAuthor = new Author();
+        updatedAuthor.setName("Updated Name");
+        updatedAuthor.setEmail("updated@example.com");
+
+        Author existingAuthor = new Author();
+        existingAuthor.setId(1);
+        existingAuthor.setName("Old Name");
+        existingAuthor.setEmail("old@example.com");
+
+        when(authorRepository.findById(authorId)).thenReturn(Optional.of(existingAuthor));
+        when(authorRepository.save(Mockito.any(Author.class))).thenReturn(existingAuthor);
+
+        // Act
+        Author updated = authorService.updateAuthor(updatedAuthor, authorId);
+
+        // Assert
+        assertNotNull(updated);
+        assertEquals("Updated Name", updated.getName());
+        assertEquals("updated@example.com", updated.getEmail());
+        verify(authorRepository, times(1)).save(existingAuthor);
+    }
+
+    @Test
+    void testUpdateAuthor_NotFound() {
+        // Arrange
+        Integer authorId = 1;
+        Author updatedAuthor = new Author();
+        updatedAuthor.setName("Updated Name");
+
+        when(authorRepository.findById(authorId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        AuthorException exception = assertThrows(AuthorException.class, () -> {
+            authorService.updateAuthor(updatedAuthor, authorId);
+        });
+
+        assertEquals("User does not exist with id 1", exception.getMessage());
+    }
+
+    @Test
+    void testUpdateAuthor_NoFieldsUpdated() throws AuthorException {
+        // Arrange
+        Integer authorId = 1;
+        Author updatedAuthor = new Author();
+        updatedAuthor.setName(null);
+        updatedAuthor.setEmail(null);
+
+        Author existingAuthor = new Author();
+        existingAuthor.setId(1);
+        existingAuthor.setName("Old Name");
+        existingAuthor.setEmail("old@example.com");
+
+        when(authorRepository.findById(authorId)).thenReturn(Optional.of(existingAuthor));
+        when(authorRepository.save(Mockito.any(Author.class))).thenReturn(existingAuthor);
+
+        // Act
+        Author updated = authorService.updateAuthor(updatedAuthor, authorId);
+
+        // Assert
+        assertNotNull(updated);
+        assertEquals("Old Name", updated.getName());
+        assertEquals("old@example.com", updated.getEmail());
+        verify(authorRepository, times(1)).save(existingAuthor);
+    }
+
+    @Test
+    void testUpdateAuthorDetails() {
+        // Arrange
+        author.setName("Updated Author Name");
+        when(authorRepository.updateAuthorDetails(Mockito.any(Author.class))).thenReturn(1); // Assume update returns 1 on success
+
+        // Act
+        authorService.updateAuthor(author);
+
+        // Assert
+        verify(authorRepository, times(1)).updateAuthorDetails(author);
+    }
+
+    @Test
+    void testDeleteAuthor() {
+        // Arrange
         int authorId = 1;
+        doNothing().when(authorRepository).deleteCustom(authorId);
 
-        doNothing().when(authorService).deleteAuthor(authorId);
+        // Act
+        authorService.deleteAuthor(authorId);
 
-        // Perform DELETE request with author ID
-        mockMvc.perform(delete("/authors/{id}", authorId))  // endpoint updated to /authors/{id}
-                .andExpect(status().isNoContent())  // 204 No Content (common for successful deletes)
-                .andExpect(content().string("Author deleted!!"));
-
-        verify(authorService, times(1)).deleteAuthor(authorId);
+        // Assert
+        verify(authorRepository, times(1)).deleteCustom(authorId);
     }
 }
