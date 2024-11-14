@@ -22,9 +22,8 @@ public class AuthorService {
         newAuthor.setEmail(author.getEmail());
         newAuthor.setAge(author.getAge());
         newAuthor.setCountry(author.getCountry());
-        newAuthor.setBooks_written(author.getBooks_written());
-        Author savedAuthor = authorRepository.save(newAuthor);
-        return savedAuthor;
+        newAuthor.setBooksWritten(author.getBooksWritten());
+        return authorRepository.save(newAuthor);
     }
     public Author findAuthorById(Integer authorId) throws AuthorException {
         Optional<Author> author = authorRepository.findById(authorId);

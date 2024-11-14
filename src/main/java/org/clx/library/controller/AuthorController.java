@@ -1,24 +1,24 @@
 package org.clx.library.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.clx.library.exception.AuthorException;
 import org.clx.library.model.Author;
 import org.clx.library.services.AuthorService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 public class AuthorController {
 
-    @Autowired
-    AuthorService authorService;
+    private final AuthorService authorService;
 
 
     @PostMapping("/createAuthor")
     public ResponseEntity<String> createAuthor( @RequestBody Author author) {
         // Call the service to create the author
-        Author createdAuthor = authorService.createAuthor(author);
+        authorService.createAuthor(author);
 
         // Return a response with a success message and the ID of the created Author
         return new ResponseEntity<>("Author created with ID: "+createdAuthor.getId(), HttpStatus.CREATED);
