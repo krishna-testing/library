@@ -1,7 +1,7 @@
 package org.clx.library.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.clx.library.services.TransactionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-
+@RequiredArgsConstructor
 public class TransactionController {
 
-    @Autowired
-    TransactionService transactionService;
+    private final TransactionService transactionService;
 
 
     //what i need ideally is card_id and book_id
@@ -33,9 +32,9 @@ public class TransactionController {
     public ResponseEntity<String> returnBook(@RequestParam("cardId") int cardId,
                                      @RequestParam("bookId") int bookId) throws Exception {
         try{
-            String transaction_id=transactionService.returnBooks(cardId,bookId);
+            String transactionId=transactionService.returnBooks(cardId,bookId);
             return new ResponseEntity<>(
-                    "Your Transaction was Successful here is your Txn id:"+transaction_id,HttpStatus.OK);
+                    "Your Transaction was Successful here is your Txn id:"+transactionId,HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

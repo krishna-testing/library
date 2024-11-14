@@ -1,7 +1,7 @@
 package org.clx.library.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.clx.library.exception.AuthorException;
+import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.model.Author;
 import org.clx.library.services.AuthorService;
 import org.springframework.http.HttpStatus;
@@ -29,7 +29,7 @@ public class AuthorController {
         try {
             authorService.updateAuthor(author, authorId);
             return new ResponseEntity<>("Author updated!!", HttpStatus.ACCEPTED);
-        } catch (AuthorException e) {
+        } catch (AuthorNotFoundException e) {
             // Handle the exception (e.g., author not found)
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }

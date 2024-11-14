@@ -1,16 +1,17 @@
 package org.clx.library.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.clx.library.model.Student;
 import org.clx.library.services.StudentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 public class StudentController {
-    @Autowired
-    StudentService studentService;
+
+    private final StudentService studentService;
 
 
     @PostMapping("/createStudent")
@@ -22,7 +23,7 @@ public class StudentController {
 
     @PutMapping("/updateStudent")
     public ResponseEntity<String> updateStudent(@RequestBody Student student){
-        int lines=studentService.updateStudent(student);
+        studentService.updateStudent(student);
         return new ResponseEntity<>("Student updated",HttpStatus.OK);
     }
 

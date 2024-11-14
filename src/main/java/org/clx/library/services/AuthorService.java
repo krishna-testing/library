@@ -1,10 +1,9 @@
 package org.clx.library.services;
 
 import lombok.AllArgsConstructor;
-import org.clx.library.exception.AuthorException;
+import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.model.Author;
 import org.clx.library.repositories.AuthorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,18 +24,18 @@ public class AuthorService {
         newAuthor.setBooksWritten(author.getBooksWritten());
         return authorRepository.save(newAuthor);
     }
-    public Author findAuthorById(Integer authorId) throws AuthorException {
+    public Author findAuthorById(Integer authorId) throws AuthorNotFoundException {
         Optional<Author> author = authorRepository.findById(authorId);
         if (author.isPresent()) {
             return author.get();
         }
-        throw new AuthorException("User not exist with userId" + authorId);
+        throw new AuthorNotFoundException("User not exist with userId" + authorId);
     }
 
-    public Author updateAuthor(Author author, Integer authorId) throws AuthorException {
+    public Author updateAuthor(Author author, Integer authorId) throws AuthorNotFoundException {
         Optional<Author> author1 = authorRepository.findById(authorId);
         if (author1.isEmpty()) {
-            throw new AuthorException("User does not exist with id " + authorId);
+            throw new AuthorNotFoundException("User does not exist with id " + authorId);
         }
         Author oldAuthor = author1.get();
         if (author.getName() != null) {

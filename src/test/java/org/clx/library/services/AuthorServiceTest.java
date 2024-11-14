@@ -54,7 +54,7 @@ class AuthorServiceTest {
     }
 
     @Test
-    void testFindAuthorById_Success() throws AuthorException {
+    void testFindAuthorById_Success() {
         // Arrange
         Integer authorId = 1;
         when(authorRepository.findById(authorId)).thenReturn(Optional.of(author));
@@ -82,7 +82,7 @@ class AuthorServiceTest {
     }
 
     @Test
-    void testUpdateAuthor_Success() throws AuthorException {
+    void testUpdateAuthor_Success() {
         // Arrange
         Integer authorId = 1;
         Author updatedAuthor = new Author();
@@ -125,7 +125,7 @@ class AuthorServiceTest {
     }
 
     @Test
-    void testUpdateAuthor_NoFieldsUpdated() throws AuthorException {
+    void testUpdateAuthor_NoFieldsUpdated() {
         // Arrange
         Integer authorId = 1;
         Author updatedAuthor = new Author();

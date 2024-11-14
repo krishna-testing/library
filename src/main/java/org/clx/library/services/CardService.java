@@ -5,7 +5,6 @@ import org.clx.library.model.Card;
 import org.clx.library.model.CardStatus;
 import org.clx.library.model.Student;
 import org.clx.library.repositories.CardRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import org.clx.library.exception.AuthorException;
-
 
 @RestController
 @RequestMapping("/api")
@@ -26,12 +24,8 @@ public class BookController {
     // Create a new Book
     @PostMapping("/createBook")
     public ResponseEntity<String> createBook(@RequestBody Book book, @RequestParam Integer authorId) {
-        try {
-            Book createdBook = bookService.createBook(book, authorId);
-            return new ResponseEntity<>("Book created with ID: " + createdBook.getId(), HttpStatus.CREATED);
-        } catch (AuthorException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        Book createdBook = bookService.createBook(book, authorId);
+        return new ResponseEntity<>("Book created with ID: " + createdBook.getId(), HttpStatus.CREATED);
     }
 
     // Delete a Book by ID (and ensure it's the author's book)
@@ -62,7 +56,7 @@ public class BookController {
             Book book = bookService.findBookById(id);
             return new ResponseEntity<>(book, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -73,7 +67,7 @@ public class BookController {
             Book updatedBook = bookService.savedBook(bookId, authorId);
             return new ResponseEntity<>(updatedBook, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 }

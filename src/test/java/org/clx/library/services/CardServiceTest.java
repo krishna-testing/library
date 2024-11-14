@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-//import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class CardServiceTest {
@@ -53,20 +52,5 @@ class CardServiceTest {
         verify(cardRepository, times(1)).deactivateCard(studentId, CardStatus.DEACTIVATED.toString());
     }
 
-    // Uncomment if getCardByStudentId is implemented in CardService
-    // @Test
-    // void testGetCardByStudentId() {
-    //     // Given
-    //     int studentId = 1;
-    //     Card card = new Card();
-    //     card.setCardStatus(CardStatus.ACTIVATED);
-    //     when(cardRepository.findByStudentId(studentId)).thenReturn(card);
 
-    //     // When
-    //     Card result = cardService.getCardByStudentId(studentId);
-
-    //     // Then
-    //     assertEquals(card, result);
-    //     verify(cardRepository, times(1)).findByStudentId(studentId);
-    // }
 }
