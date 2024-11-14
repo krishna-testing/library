@@ -52,5 +52,4 @@ class CardServiceTest {
         verify(cardRepository, times(1)).deactivateCard(studentId, CardStatus.DEACTIVATED.toString());
     }
 
-
 }

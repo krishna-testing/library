@@ -30,7 +30,6 @@ class StudentServiceTest {
     private CardService cardService;
 
 
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -94,7 +93,5 @@ class StudentServiceTest {
         verify(cardService, times(1)).deactivate(studentId);  // Verify deactivation
         verify(studentRepository, times(1)).deleteCustom(studentId);  // Verify student deletion
     }
-
-
 
 }
