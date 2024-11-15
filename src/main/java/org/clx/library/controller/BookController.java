@@ -1,5 +1,7 @@
 package org.clx.library.controller;
 
+import org.clx.library.exception.AuthorNotFoundException;
+import org.clx.library.exception.BookNotFoundException;
 import org.clx.library.model.Book;
 import org.clx.library.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +26,13 @@ public class BookController {
     // Create a new Book
     @PostMapping("/createBook")
     public ResponseEntity<String> createBook(@RequestBody Book book, @RequestParam Integer authorId) {
-        Book createdBook = bookService.createBook(book, authorId);
-        return new ResponseEntity<>("Book created with ID: " + createdBook.getId(), HttpStatus.CREATED);
+        try {
+            Book createdBook = bookService.createBook(book, authorId);
+            return new ResponseEntity<>("Book created with ID: " + createdBook.getId(), HttpStatus.CREATED);
+        }catch (AuthorNotFoundException ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+
     }
 
     // Delete a Book by ID (and ensure it's the author's book)
@@ -55,7 +62,7 @@ public class BookController {
         try {
             Book book = bookService.findBookById(id);
             return new ResponseEntity<>(book, HttpStatus.OK);
-        } catch (Exception e) {
+        } catch (BookNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

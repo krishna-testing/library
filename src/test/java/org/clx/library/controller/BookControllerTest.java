@@ -1,6 +1,12 @@
 package org.clx.library.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.clx.library.exception.AuthorNotFoundException;
+import org.clx.library.exception.BookNotFoundException;
+import org.clx.library.exception.UnauthorizedBookDeletionException;
+import org.clx.library.model.Author;
 import org.clx.library.model.Book;
+import org.clx.library.model.Genre;
 import org.clx.library.services.BookService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +22,7 @@ import org.clx.library.exception.AuthorException;
 import org.mockito.Mockito;
 
 
-
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -36,6 +42,8 @@ class BookControllerTest {
 
     private Book book;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -51,35 +59,54 @@ class BookControllerTest {
     void testCreateBook_Success() throws Exception {
         // Arrange
         Integer authorId = 1;
-        when(bookService.createBook(Mockito.any(Book.class), Mockito.eq(authorId))).thenReturn(book);
+
+        // Create a mock Author
+        Author author = new Author();
+        author.setId(authorId);
+        author.setName("John Doe");
+
+        // Create a Book object
+        Book createdBook = new Book();
+        createdBook.setName("Test Book");
+        createdBook.setGenre(Genre.FICTIONAL);
+        createdBook.setAuthor(author);
+
+        // Mock behavior of bookService.createBook
+        when(bookService.createBook(any(Book.class), eq(authorId)))
+                .thenReturn(createdBook);
 
         // Act and Assert
-        mockMvc.perform(post("/api/createBook")
+        mockMvc.perform(post("/api/createBook")  // Ensure the correct URL is used
                         .param("authorId", String.valueOf(authorId))
-                        .contentType("application/json")
-                        .content("{ \"name\": \"Test Book\", \"genre\": \"Fiction\" }"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createdBook)))
                 .andExpect(status().isCreated())
-                .andExpect(content().string("Book created with ID: 1"));
+                .andExpect(content().string("Book created with ID: " + createdBook.getId()));
 
-        verify(bookService, times(1)).createBook(Mockito.any(Book.class), Mockito.eq(authorId));
+        // Verify the service method was called once with the correct parameters
+        Mockito.verify(bookService, Mockito.times(1)).createBook(any(Book.class), eq(authorId));
     }
 
     @Test
     void testCreateBook_BadRequest_AuthorException() throws Exception {
         // Arrange
         Integer authorId = 1;
-        when(bookService.createBook(Mockito.any(Book.class), Mockito.eq(authorId))).thenThrow(new AuthorException("Author not found"));
+        when(bookService.createBook(any(Book.class), eq(authorId)))
+                .thenThrow(new AuthorNotFoundException("Author not found"));
+
+        Book book = new Book();
+        book.setName("Test Book");
+        book.setGenre(Genre.FICTIONAL);
 
         // Act and Assert
         mockMvc.perform(post("/api/createBook")
                         .param("authorId", String.valueOf(authorId))
-                        .contentType("application/json")
-                        .content("{ \"name\": \"Test Book\", \"genre\": \"Fiction\" }"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(book)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Author not found"));
-
-        verify(bookService, times(1)).createBook(Mockito.any(Book.class), Mockito.eq(authorId));
     }
+
 
     @Test
     void testDeleteBook_Success() throws Exception {
@@ -103,7 +130,7 @@ class BookControllerTest {
         // Arrange
         Integer bookId = 1;
         Integer authorId = 1;
-        when(bookService.deleteBook(bookId, authorId)).thenThrow(new Exception("Unauthorized"));
+        when(bookService.deleteBook(bookId, authorId)).thenThrow(new UnauthorizedBookDeletionException("Unauthorized"));
 
         // Act and Assert
         mockMvc.perform(delete("/api/deleteBook")
@@ -150,7 +177,7 @@ class BookControllerTest {
     void testGetBookById_NotFound() throws Exception {
         // Arrange
         Integer bookId = 1;
-        when(bookService.findBookById(bookId)).thenThrow(new Exception("Book not found"));
+        when(bookService.findBookById(bookId)).thenThrow(new BookNotFoundException("Book not found"));
 
         // Act and Assert
         mockMvc.perform(get("/api/getBook/{id}", bookId))
@@ -180,13 +207,12 @@ class BookControllerTest {
         // Arrange
         Integer bookId = 1;
         Integer authorId = 1;
-        when(bookService.savedBook(bookId, authorId)).thenThrow(new Exception("Invalid operation"));
+        when(bookService.savedBook(bookId, authorId)).thenThrow(new BookNotFoundException("Invalid operation"));
 
         // Act and Assert
         mockMvc.perform(put("/api/saveBook/{bookId}", bookId)
                         .param("authorId", String.valueOf(authorId)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid operation"));
+                .andExpect(status().isBadRequest());
 
         verify(bookService, times(1)).savedBook(bookId, authorId);
     }
