@@ -18,7 +18,6 @@ import java.util.List;
 
 import static org.mockito.Mockito.*;
 
-import org.clx.library.exception.AuthorException;
 import org.mockito.Mockito;
 
 
@@ -94,15 +93,15 @@ class BookControllerTest {
         when(bookService.createBook(any(Book.class), eq(authorId)))
                 .thenThrow(new AuthorNotFoundException("Author not found"));
 
-        Book book = new Book();
-        book.setName("Test Book");
-        book.setGenre(Genre.FICTIONAL);
+        Book createdBook = new Book();
+        createdBook.setName("Test Book");
+        createdBook.setGenre(Genre.FICTIONAL);
 
         // Act and Assert
         mockMvc.perform(post("/api/createBook")
                         .param("authorId", String.valueOf(authorId))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(book)))
+                        .content(objectMapper.writeValueAsString(createdBook)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Author not found"));
     }
