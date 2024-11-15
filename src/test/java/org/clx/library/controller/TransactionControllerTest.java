@@ -1,5 +1,6 @@
 package org.clx.library.controller;
 
+import org.clx.library.exception.BookNotFoundException;
 import org.clx.library.services.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ class TransactionControllerTest {
         int cardId = 1;
         int bookId = 1;
 
-        when(transactionService.issueBooks(cardId, bookId)).thenThrow(new Exception("Book is unavailable!"));
+        when(transactionService.issueBooks(cardId, bookId)).thenThrow(new BookNotFoundException("Book is unavailable!"));
 
         ResponseEntity<String> response = transactionController.issueBook(cardId, bookId);
 
@@ -74,7 +75,7 @@ class TransactionControllerTest {
         int cardId = 1;
         int bookId = 1;
 
-        when(transactionService.returnBooks(cardId, bookId)).thenThrow(new Exception("Transaction failed"));
+        when(transactionService.returnBooks(cardId, bookId)).thenThrow(new BookNotFoundException("Transaction failed"));
 
         ResponseEntity<String> response = transactionController.returnBook(cardId, bookId);
 
