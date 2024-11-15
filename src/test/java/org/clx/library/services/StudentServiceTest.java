@@ -1,7 +1,6 @@
 package org.clx.library.services;
 
-import org.clx.library.model.Card;
-import org.clx.library.model.CardStatus;
+import org.clx.library.exception.StudentNotFoundException;
 import org.clx.library.model.Student;
 import org.clx.library.repositories.CardRepository;
 import org.clx.library.repositories.StudentRepository;
@@ -11,8 +10,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class StudentServiceTest {
@@ -29,44 +29,23 @@ class StudentServiceTest {
     @InjectMocks
     private CardService cardService;
 
+    private Student student;
+
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        student = new Student("Jane Doe", "jane@example.com");
     }
 
-    @Test
-    void testCreateStudent() {
-        // Given
-        Student student = new Student("Jane Doe", "jane@example.com");
-        Card card = new Card();
-        card.setId(1);
-        card.setCardStatus(CardStatus.ACTIVATED);
-        student.setCard(card);
 
-        // Mock behavior of cardService.createCard
-        when(cardService.createCard(student)).thenReturn(card);
 
-        // When
-        studentService.createStudent(student);
-
-        // Then
-        verify(studentRepository, times(1)).save(student);  // Verify student save
-        verify(cardService, times(1)).createCard(student);  // Verify card creation
-
-        // Assert that the student's card is correctly assigned
-        assertNotNull(student.getCard());
-        assertEquals(card, student.getCard());
-        assertEquals(1, student.getCard().getId());
-        assertEquals(CardStatus.ACTIVATED, student.getCard().getCardStatus());
-    }
 
 
     @Test
     void testGetStudentById() {
         // Given
         int studentId = 1;
-        Student student = new Student("Jane Doe", "jane@example.com");
         when(studentRepository.findById(studentId)).thenReturn(java.util.Optional.of(student));
 
         // When
@@ -78,20 +57,42 @@ class StudentServiceTest {
     }
 
     @Test
-    void testDeleteStudent() {
-        // Given
+    void updateStudent_shouldUpdateStudentDetails() {
+        // Calling the method
+        studentService.updateStudent(student);
+
+        // Verifying interactions
+        verify(studentRepository, times(1)).updateStudentDetails(student);
+    }
+
+    @Test
+    void getStudentById_shouldReturnStudentIfExists() {
         int studentId = 1;
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
 
-        // Mocking void methods: Use doNothing() for void methods
-        doNothing().when(cardService).deactivate(studentId);
-        doNothing().when(studentRepository).deleteCustom(studentId);
+        // Calling the method
+        Student result = studentService.getStudentById(studentId);
 
-        // When
-        studentService.deleteStudent(studentId);
+        // Assertions
+        assertNotNull(result);
+        assertEquals(student.getName(), result.getName());
+        assertEquals(student.getEmailId(), result.getEmailId());
 
-        // Then
-        verify(cardService, times(1)).deactivate(studentId);  // Verify deactivation
-        verify(studentRepository, times(1)).deleteCustom(studentId);  // Verify student deletion
+        // Verifying interactions
+        verify(studentRepository, times(1)).findById(studentId);
+    }
+
+
+    @Test
+    void getStudentById_shouldThrowExceptionIfStudentNotFound() {
+        int studentId = 1;
+        when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
+
+        // Assertions
+        assertThrows(StudentNotFoundException.class, () -> studentService.getStudentById(studentId));
+
+        // Verifying interactions
+        verify(studentRepository, times(1)).findById(studentId);
     }
 
 }

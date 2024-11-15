@@ -9,7 +9,6 @@ import org.clx.library.model.*;
 import org.clx.library.repositories.BookRepository;
 import org.clx.library.repositories.CardRepository;
 import org.clx.library.repositories.TransactionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

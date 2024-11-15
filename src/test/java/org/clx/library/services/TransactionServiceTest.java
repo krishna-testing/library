@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
@@ -42,10 +43,13 @@ class TransactionServiceTest {
         // Mocking
         int cardId = 1;
         int bookId = 1;
+
         Book book = new Book();
         book.setAvailable(true);
+
         Card card = new Card();
         card.setCardStatus(CardStatus.ACTIVATED);
+        card.setBooks(new ArrayList<>()); // Initialize books list
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));

@@ -20,6 +20,7 @@ public class StudentService {
     private final CardService cardService;
 
     public void createStudent(Student student) {
+        studentRepository.save(student);
         Card card = cardService.createCard(student);
         logger.info("Card created for student with ID: {} and card ID: {}", student.getId(), card.getId());
     }

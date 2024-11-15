@@ -1,72 +1,102 @@
 package org.clx.library.controller;
 
+import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.model.Author;
 import org.clx.library.services.AuthorService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import static org.mockito.Mockito.*;
 
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@WebMvcTest(AuthorController.class)
 class AuthorControllerTest {
 
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private AuthorService authorService;
 
     @InjectMocks
     private AuthorController authorController;
 
-    @Test
-    void createAuthorTest() throws Exception {
-        mockMvc = MockMvcBuilders.standaloneSetup(authorController).build();
-        doNothing().when(authorService).createAuthor(any(Author.class));
+    private MockMvc mockMvc;
 
+    private Author author;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(authorController).build();
+
+        // Initialize the Author object
+        author = new Author();
+        author.setId(1);
+        author.setName("Author Name");
+        author.setEmail("author@example.com");
+        author.setAge(45);
+        author.setCountry("Country");
+    }
+
+    @Test
+    void testCreateAuthor() throws Exception {
+        // Arrange
+        when(authorService.createAuthor(any(Author.class))).thenReturn(author);
+
+        // Act & Assert
         mockMvc.perform(post("/createAuthor")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"John Doe\",\"email\":\"john.doe@example.com\",\"age\":45,\"country\":\"USA\"}"))
+                        .content("{\"name\": \"Author Name\", \"email\": \"author@example.com\", \"age\": 45, \"country\": \"Country\"}"))
                 .andExpect(status().isCreated())
-                .andExpect(content().string("Author created"));
-
-        verify(authorService, times(1)).createAuthor(any(Author.class));
+                .andExpect(content().string("Author created with ID: 1"));
     }
 
     @Test
-    void updateAuthorTest() throws Exception {
-        mockMvc = MockMvcBuilders.standaloneSetup(authorController).build();
-        doNothing().when(authorService).updateAuthor(any(Author.class));
+    void testUpdateAuthor_Success() throws Exception {
+        // Arrange
+        Author updatedAuthor = new Author();
+        updatedAuthor.setName("Updated Name");
+        updatedAuthor.setEmail("updated@example.com");
 
-        mockMvc.perform(put("/updateAuthor")
+        when(authorService.updateAuthor(any(Author.class), eq(1))).thenReturn(updatedAuthor);
+
+        // Act & Assert
+        mockMvc.perform(put("/updateAuthor/{authorId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Jane Doe\",\"email\":\"jane.doe@example.com\",\"age\":35,\"country\":\"Canada\"}"))
+                        .content("{\"name\": \"Updated Name\", \"email\": \"updated@example.com\"}"))
                 .andExpect(status().isAccepted())
                 .andExpect(content().string("Author updated!!"));
-
-        verify(authorService, times(1)).updateAuthor(any(Author.class));
     }
 
     @Test
-    void deleteAuthorTest() throws Exception {
-        mockMvc = MockMvcBuilders.standaloneSetup(authorController).build();
-        int authorId = 1;
+    void testUpdateAuthor_NotFound() throws Exception {
+        // Arrange
+        when(authorService.updateAuthor(any(Author.class), eq(1)))
+                .thenThrow(new AuthorNotFoundException("Author with ID 1 not found"));
 
-        doNothing().when(authorService).deleteAuthor(authorId);
+        // Act & Assert
+        mockMvc.perform(put("/updateAuthor/{authorId}", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\": \"Updated Name\"}"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Author with ID 1 not found"));
+    }
 
-        mockMvc.perform(delete("/deleteAuthor")
-                        .param("id", String.valueOf(authorId)))
-                .andExpect(status().isAccepted())
+    @Test
+    void testDeleteAuthor() throws Exception {
+        // Arrange
+        doNothing().when(authorService).deleteAuthor(1);
+
+        // Act & Assert
+        mockMvc.perform(delete("/{id}", 1))
+                .andExpect(status().isNoContent())
                 .andExpect(content().string("Author deleted!!"));
 
-        verify(authorService, times(1)).deleteAuthor(authorId);
+        // Verify that deleteAuthor method was called once
+        verify(authorService, times(1)).deleteAuthor(1);
     }
 }

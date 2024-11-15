@@ -33,9 +33,10 @@ public class StudentController {
         return new ResponseEntity<>("student successfully deleted!!",HttpStatus.OK);
     }
 
-
-    public ResponseEntity<Student> getStudentById(int studentId) {
-        Student student=studentService.getStudentById(studentId);
-        return new ResponseEntity<>(student,HttpStatus.OK);
+    @GetMapping("/getStudentById")
+    public ResponseEntity<Student> getStudentById(@RequestParam("id") int studentId) {
+        Student student = studentService.getStudentById(studentId);
+        return new ResponseEntity<>(student, HttpStatus.OK);
     }
+
 }

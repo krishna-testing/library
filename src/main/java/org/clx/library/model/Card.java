@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -50,6 +51,7 @@ public class Card {
     public Card(Student student, CardStatus status) {
         this.student = student;
         this.cardStatus = status;
+        this.books = new ArrayList<>();
     }
 
 }

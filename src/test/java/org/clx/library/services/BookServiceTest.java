@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
-import org.clx.library.exception.AuthorException;
 import org.clx.library.model.Author;
 import org.clx.library.repositories.AuthorRepository;
 
@@ -60,7 +59,7 @@ class BookServiceTest {
     }
 
     @Test
-    void testCreateBook() throws AuthorException {
+    void testCreateBook() {
         // Arrange
         Integer authorId = 1;
         when(authorService.findAuthorById(authorId)).thenReturn(author);
@@ -105,7 +104,7 @@ class BookServiceTest {
             bookService.deleteBook(bookId, authorId);
         });
 
-        assertEquals("You can't delete Unother book", exception.getMessage());
+        assertEquals("You are not authorized to delete this book.", exception.getMessage());
     }
 
     @Test
@@ -138,7 +137,7 @@ class BookServiceTest {
             bookService.findBookById(bookId);
         });
 
-        assertEquals("Post not Found with this id1", exception.getMessage());
+        assertEquals("Book not found with this id: 1", exception.getMessage());
     }
 
     @Test

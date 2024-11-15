@@ -1,6 +1,8 @@
 package org.clx.library.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.clx.library.exception.BookNotFoundException;
+import org.clx.library.exception.CardNotFoundException;
 import org.clx.library.services.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +32,7 @@ public class TransactionController {
     }
     @PostMapping("/returnBook")
     public ResponseEntity<String> returnBook(@RequestParam("cardId") int cardId,
-                                     @RequestParam("bookId") int bookId) throws Exception {
+                                     @RequestParam("bookId") int bookId) throws BookNotFoundException, CardNotFoundException {
         try{
             String transactionId=transactionService.returnBooks(cardId,bookId);
             return new ResponseEntity<>(

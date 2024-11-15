@@ -1,6 +1,6 @@
 package org.clx.library.services;
 
-import org.clx.library.exception.AuthorException;
+import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.model.Author;
 import org.clx.library.repositories.AuthorRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,7 +74,7 @@ class AuthorServiceTest {
         when(authorRepository.findById(authorId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        AuthorException exception = assertThrows(AuthorException.class, () -> {
+        AuthorNotFoundException exception = assertThrows(AuthorNotFoundException.class, () -> {
             authorService.findAuthorById(authorId);
         });
 
@@ -117,7 +117,7 @@ class AuthorServiceTest {
         when(authorRepository.findById(authorId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        AuthorException exception = assertThrows(AuthorException.class, () -> {
+        AuthorNotFoundException exception = assertThrows(AuthorNotFoundException.class, () -> {
             authorService.updateAuthor(updatedAuthor, authorId);
         });
 
@@ -167,7 +167,6 @@ class AuthorServiceTest {
     void testDeleteAuthor() {
         // Arrange
         int authorId = 1;
-        doNothing().when(authorRepository).deleteCustom(authorId);
 
         // Act
         authorService.deleteAuthor(authorId);
@@ -175,4 +174,5 @@ class AuthorServiceTest {
         // Assert
         verify(authorRepository, times(1)).deleteCustom(authorId);
     }
+
 }

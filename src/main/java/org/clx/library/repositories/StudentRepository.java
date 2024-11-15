@@ -6,10 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Transactional
+@Repository
 public interface StudentRepository extends JpaRepository<Student,Integer> {
 
     //JPQL-->Java persistence Query language-->(Objects and Attributes)
@@ -22,16 +23,16 @@ public interface StudentRepository extends JpaRepository<Student,Integer> {
 
 
     @Modifying
-    @Query("delete from Student s where s.id=:id ")
-    int deleteCustom(@Param("id") int id);
+    @Transactional
+    @Query("DELETE FROM Student s WHERE s.id = :id")
+    void deleteCustom(@Param("id") int id);
 
 
     @Modifying
-    @Query("update Student s set s.emailId= :#{#student.emailId}," +
-            "s.name=:#{#student.name}," +
-            "s.age=:#{#student.age}," +
-            "s.country=:#{#student.country} where s.id=:#{#student.id}")
-    int updateStudentDetails(@Param("student") Student student);
+    @Transactional
+    @Query("UPDATE Student s SET s.name = :#{#student.name}, s.emailId = :#{#student.emailId}, " +
+            "s.age = :#{#student.age}, s.country = :#{#student.country} WHERE s.id = :#{#student.id}")
+    void updateStudentDetails(@Param("student") Student student);
 
     //find student by given name
     //Terminal---> Select * from student where email =email
