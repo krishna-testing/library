@@ -1,6 +1,7 @@
 package org.clx.library.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.model.Author;
 import org.clx.library.services.AuthorService;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 public class AuthorController {
 
@@ -19,6 +21,7 @@ public class AuthorController {
     public ResponseEntity<String> createAuthor( @RequestBody Author author) {
         // Call the service to create the author
         Author createAuthor = authorService.createAuthor(author);
+        log.info("author created successfully with name {}",createAuthor.getName());
 
         // Return a response with a success message and the ID of the created Author
         return new ResponseEntity<>("Author created with ID: "+createAuthor.getId(), HttpStatus.CREATED);
