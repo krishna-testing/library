@@ -49,7 +49,7 @@ class CardServiceTest {
         cardService.deactivate(studentId);
 
         // Then
-        verify(cardRepository, times(1)).deactivateCard(studentId, CardStatus.DEACTIVATED.toString());
+        verify(cardRepository, times(1)).deactivateCard(studentId, CardStatus.DEACTIVATED);
     }
 
 }

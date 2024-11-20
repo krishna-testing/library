@@ -1,6 +1,7 @@
 package org.clx.library.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn
+    @JsonIgnore
     private Card card;
 
     private int fineAmount;

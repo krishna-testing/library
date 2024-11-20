@@ -1,6 +1,7 @@
 package org.clx.library.services;
 
 import org.clx.library.model.Book;
+import org.clx.library.model.Genre;
 import org.clx.library.repositories.BookRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,7 +22,6 @@ import org.clx.library.repositories.AuthorRepository;
 import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -159,11 +160,11 @@ class BookServiceTest {
     @Test
     void testGetBooksByGenreAndAuthor() {
         // Arrange
-        String genre = "Fiction";
+        String genre = "FICTIONAL";
         String authorName = "Author Name";
         boolean isAvailable = true;
-        List<Book> books = Arrays.asList(book);
-        when(bookRepository.findBooksByGenre_Author(genre, authorName, isAvailable)).thenReturn(books);
+        List<Book> books = Collections.singletonList(book);
+        when(bookRepository.findBooksByGenre_Author(Genre.valueOf(genre), authorName, isAvailable)).thenReturn(books);
 
         // Act
         List<Book> result = bookService.getBooks(genre, isAvailable, authorName);
@@ -171,16 +172,16 @@ class BookServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(book.getName(), result.get(0).getName());
+        assertEquals(book.getName(), result.getFirst().getName());
     }
 
     @Test
     void testGetBooksByGenre() {
         // Arrange
-        String genre = "Fiction";
+        String genre = "FICTIONAL";
         boolean isAvailable = true;
-        List<Book> books = Arrays.asList(book);
-        when(bookRepository.findBooksByGenre(genre, isAvailable)).thenReturn(books);
+        List<Book> books = Collections.singletonList(book);
+        when(bookRepository.findBooksByGenre(Genre.valueOf(genre), isAvailable)).thenReturn(books);
 
         // Act
         List<Book> result = bookService.getBooks(genre, isAvailable, null);
@@ -188,7 +189,7 @@ class BookServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(book.getName(), result.get(0).getName());
+        assertEquals(book.getName(), result.getFirst().getName());
     }
 
     @Test
@@ -196,7 +197,7 @@ class BookServiceTest {
         // Arrange
         String authorName = "Author Name";
         boolean isAvailable = true;
-        List<Book> books = Arrays.asList(book);
+        List<Book> books = Collections.singletonList(book);
         when(bookRepository.findBooksByAuthor(authorName, isAvailable)).thenReturn(books);
 
         // Act
@@ -205,6 +206,6 @@ class BookServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(book.getName(), result.get(0).getName());
+        assertEquals(book.getName(), result.getFirst().getName());
     }
 }
