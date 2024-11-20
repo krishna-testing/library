@@ -1,7 +1,6 @@
 package org.clx.library.services;
 
 import lombok.AllArgsConstructor;
-import org.clx.library.controller.AuthorController;
 import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.model.Author;
 import org.clx.library.repositories.AuthorRepository;
@@ -19,7 +18,7 @@ public class AuthorService {
     private final AuthorRepository authorRepository;
 
     public Author createAuthor(Author author) {
-        try {
+
             Author newAuthor = new Author();
             newAuthor.setId(author.getId());
             newAuthor.setName(author.getName());
@@ -31,10 +30,7 @@ public class AuthorService {
             Author savedAuthor = authorRepository.save(newAuthor);
             logger.info("Author created successfully with ID: {}", savedAuthor.getId());
             return savedAuthor;
-        } catch (Exception ae) {
-            logger.error("Error occurred while creating author: {}", ae.getMessage(), ae);
-            throw ae;
-        }
+
     }
     public Author findAuthorById(Integer authorId) throws AuthorNotFoundException {
         logger.info("Received request to find author with ID: {}", authorId);

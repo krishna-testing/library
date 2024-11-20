@@ -34,7 +34,7 @@ public class TransactionService {
     int finePerDay;
 
 
-    public String issueBooks(int cardId,int bookId) throws BookNotFoundException, CardNotFoundException {
+    public String issueBooks(int cardId, int bookId) throws BookNotFoundException, CardNotFoundException {
 
         // Use findById() and check if the book exists
         Optional<Book> optionalBook = bookRepository.findById(bookId);
@@ -42,28 +42,28 @@ public class TransactionService {
             throw new BookNotFoundException("Book not found!!");
         }
 
-        Book book = optionalBook.get(); // Now it's safe to use book
+        Book book = optionalBook.get();
 
         // Check if the book is available
         if (!book.getAvailable()) {  // Use getAvailable() instead of isAvailable()
             throw new BookNotFoundException("Book is unavailable!");
         }
 
-        Card card=cardRepository.findById(cardId)
-                .orElseThrow(()-> new CardNotFoundException("Card Not Found With id : "+cardId));
-        if (card==null||card.getCardStatus()== CardStatus.DEACTIVATED){
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new CardNotFoundException("Card Not Found With id : " + cardId));
+        if (card == null || card.getCardStatus() == CardStatus.DEACTIVATED) {
             throw new CardInvalidException("Card is invalid!!");
         }
-        if (card.getBooks().size()>maxAllowedBooks){
+        if (card.getBooks().size() > maxAllowedBooks) {
             throw new MaxAllowedBooksException("Book limit reached for this card!!");
         }
         book.setAvailable(false);
         book.setCard(card);
-        List<Book> books=card.getBooks();
+        List<Book> books = card.getBooks();
         books.add(book);
         card.setBooks(books);
         bookRepository.updateBook(book);
-        Transaction transaction=new Transaction();
+        Transaction transaction = new Transaction();
         transaction.setCard(card);
         transaction.setBook(book);
         transaction.setIsIssueOperation(true);
@@ -72,23 +72,23 @@ public class TransactionService {
         return transaction.getTransactionId();
     }
 
-    public String returnBooks(int cardId,int bookId)throws BookNotFoundException, CardNotFoundException{
-        List<Transaction> transactions=transactionRepository.findByCard_Book(cardId,bookId,TransactionStatus.SUCCESSFUL,true);
-        Transaction lastIssueTransaction=transactions.get(transactions.size()-1);
+    public String returnBooks(int cardId, int bookId) throws BookNotFoundException, CardNotFoundException {
+        List<Transaction> transactions = transactionRepository.findByCard_Book(cardId, bookId, TransactionStatus.SUCCESSFUL, true);
+        Transaction lastIssueTransaction = transactions.get(transactions.size() - 1);
         //Last transaction that has been done ^^^^
-        Date issueDate=lastIssueTransaction.getTransactionDate();
-        long issueTime=Math.abs(issueDate.getTime()-System.currentTimeMillis());
-        long numberOfDaysPassed= TimeUnit.DAYS.convert(issueTime,TimeUnit.MILLISECONDS);
-        int fine=0;
-        if (numberOfDaysPassed>maxDaysAllowed){
-            fine=(int)Math.abs(numberOfDaysPassed-maxDaysAllowed)*finePerDay;
+        Date issueDate = lastIssueTransaction.getTransactionDate();
+        long issueTime = Math.abs(issueDate.getTime() - System.currentTimeMillis());
+        long numberOfDaysPassed = TimeUnit.DAYS.convert(issueTime, TimeUnit.MILLISECONDS);
+        int fine = 0;
+        if (numberOfDaysPassed > maxDaysAllowed) {
+            fine = (int) Math.abs(numberOfDaysPassed - maxDaysAllowed) * finePerDay;
         }
-        Card card=lastIssueTransaction.getCard();
-        Book book=lastIssueTransaction.getBook();
+        Card card = lastIssueTransaction.getCard();
+        Book book = lastIssueTransaction.getBook();
         book.setCard(null);
         book.setAvailable(true);
         bookRepository.updateBook(book);
-        Transaction newTransaction=new Transaction();
+        Transaction newTransaction = new Transaction();
         newTransaction.setBook(book);
         newTransaction.setCard(card);
         newTransaction.setFineAmount(fine);
@@ -97,9 +97,6 @@ public class TransactionService {
         transactionRepository.save(newTransaction);
         return newTransaction.getTransactionId();
     }
-
-
-
 
 
 }

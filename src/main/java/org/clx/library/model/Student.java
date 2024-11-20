@@ -16,30 +16,20 @@ public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
     private String emailId;
-
-
     private String name;
-
     //Future scope adult books filter
     private int age;
     private String country;
-
-
     @OneToOne
     @JoinColumn
     private Card card;
-
-
     @CreationTimestamp
     private Date createdOn;
-
     @UpdateTimestamp
     private Date updatedOn;
 
-
-    public Student(){
+    public Student() {
     }
 
     public Student(String name, String emailId) {

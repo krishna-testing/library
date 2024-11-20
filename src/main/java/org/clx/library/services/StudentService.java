@@ -26,15 +26,18 @@ public class StudentService {
     }
 
     public void updateStudent(Student student) {
+        logger.info("Student updated successfully");
         studentRepository.updateStudentDetails(student);
     }
 
     public void deleteStudent(int id) {
         cardService.deactivate(id);
+        logger.info("Student deleted successfully");
         studentRepository.deleteCustom(id);
     }
 
     public Student getStudentById(int studentId) {
+        logger.info(" Student got successfully with the StudentId");
         return studentRepository.findById(studentId)
                 .orElseThrow(() -> new StudentNotFoundException("Student with ID " + studentId + " not found"));
     }
