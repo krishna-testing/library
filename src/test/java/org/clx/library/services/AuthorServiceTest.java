@@ -78,7 +78,7 @@ class AuthorServiceTest {
             authorService.findAuthorById(authorId);
         });
 
-        assertEquals("User not exist with userId1", exception.getMessage());
+        assertEquals("User does not exist with userId: 1", exception.getMessage());
     }
 
     @Test
@@ -121,7 +121,7 @@ class AuthorServiceTest {
             authorService.updateAuthor(updatedAuthor, authorId);
         });
 
-        assertEquals("User does not exist with id 1", exception.getMessage());
+        assertEquals("User does not exist with ID: 1", exception.getMessage());
     }
 
     @Test
