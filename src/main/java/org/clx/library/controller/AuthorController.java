@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthorController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthorController.class); // Logger initialization
+    private static final Logger logger = LoggerFactory.getLogger(AuthorController.class);
     private final AuthorService authorService;
 
     @PostMapping("/createAuthor")
     public ResponseEntity<String> createAuthor(@RequestBody Author author) {
-        logger.info("Received request to create author: {}", author);
+
         try {
             Author createdAuthor = authorService.createAuthor(author);
             logger.info("Author created successfully with ID: {}", createdAuthor.getId());
