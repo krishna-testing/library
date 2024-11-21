@@ -2,6 +2,7 @@ package org.clx.library.services;
 
 import lombok.AllArgsConstructor;
 import org.clx.library.dto.AuthorDto;
+import org.clx.library.dto.AuthorRequest;
 import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.model.Author;
 import org.clx.library.repositories.AuthorRepository;
@@ -44,15 +45,14 @@ public class AuthorService {
         return author;
     }
 
-    public AuthorDto createAuthor(AuthorDto authorDto) {
+    public AuthorRequest createAuthor(AuthorRequest authorRequest) {
         // Convert DTO to entity
-        Author author = mapToEntity(authorDto);
-
+//        Author author = mapToEntity(authorDto);
+        Author author = authorRequest.authorRequestToAuthor(authorRequest);
         Author savedAuthor = authorRepository.save(author);
         logger.info("Author created successfully with ID: {}", savedAuthor.getId());
 
-        // Convert saved entity back to DTO
-        return mapToDto(savedAuthor);
+        return authorRequest;
     }
 
     public AuthorDto findAuthorById(Integer authorId) throws AuthorNotFoundException {

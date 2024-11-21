@@ -63,6 +63,7 @@ package org.clx.library.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.clx.library.dto.AuthorDto;
+import org.clx.library.dto.AuthorRequest;
 import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.services.AuthorService;
 import org.slf4j.Logger;
@@ -80,12 +81,12 @@ public class AuthorController {
 
     // Create Author Endpoint
     @PostMapping("/createAuthor")
-    public ResponseEntity<String> createAuthor(@RequestBody AuthorDto authorDto) {
+    public ResponseEntity<String> createAuthor(@RequestBody AuthorRequest authorRequest) {
         try {
             // Pass the AuthorDto to the service layer
-            AuthorDto createdAuthor = authorService.createAuthor(authorDto);
-            logger.info("Author created successfully with ID: {}", createdAuthor.getId());
-            return new ResponseEntity<>("Author created with ID: " + createdAuthor.getId(), HttpStatus.CREATED);
+            authorService.createAuthor(authorRequest);
+            logger.info("Author created successfully.");
+            return new ResponseEntity<>("Author created successfully", HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error("Error creating author: {}", e.getMessage());
             return new ResponseEntity<>("Failed to create author", HttpStatus.INTERNAL_SERVER_ERROR);

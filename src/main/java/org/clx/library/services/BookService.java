@@ -3,6 +3,7 @@ package org.clx.library.services;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clx.library.dto.AuthorDto;
+import org.clx.library.dto.BookDto;
 import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.exception.BookNotFoundException;
 import org.clx.library.exception.UnauthorizedBookDeletionException;
