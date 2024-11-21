@@ -1,7 +1,7 @@
 package org.clx.library.controller;
 
+import org.clx.library.dto.AuthorDto;
 import org.clx.library.exception.AuthorNotFoundException;
-import org.clx.library.model.Author;
 import org.clx.library.services.AuthorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,26 +26,26 @@ class AuthorControllerTest {
 
     private MockMvc mockMvc;
 
-    private Author author;
+    private AuthorDto authorDto;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(authorController).build();
 
-        // Initialize the Author object
-        author = new Author();
-        author.setId(1);
-        author.setName("Author Name");
-        author.setEmail("author@example.com");
-        author.setAge(45);
-        author.setCountry("Country");
+        // Initialize the AuthorDto object
+        authorDto = new AuthorDto();
+        authorDto.setId(1);
+        authorDto.setName("Author Name");
+        authorDto.setEmail("author@example.com");
+        authorDto.setAge(45);
+        authorDto.setCountry("Country");
     }
 
     @Test
     void testCreateAuthor() throws Exception {
         // Arrange
-        when(authorService.createAuthor(any(Author.class))).thenReturn(author);
+        when(authorService.createAuthor(any(AuthorDto.class))).thenReturn(authorDto);
 
         // Act & Assert
         mockMvc.perform(post("/createAuthor")
@@ -58,11 +58,11 @@ class AuthorControllerTest {
     @Test
     void testUpdateAuthor_Success() throws Exception {
         // Arrange
-        Author updatedAuthor = new Author();
-        updatedAuthor.setName("Updated Name");
-        updatedAuthor.setEmail("updated@example.com");
+        AuthorDto updatedAuthorDto = new AuthorDto();
+        updatedAuthorDto.setName("Updated Name");
+        updatedAuthorDto.setEmail("updated@example.com");
 
-        when(authorService.updateAuthor(any(Author.class), eq(1))).thenReturn(updatedAuthor);
+        when(authorService.updateAuthor(any(AuthorDto.class), eq(1))).thenReturn(updatedAuthorDto);
 
         // Act & Assert
         mockMvc.perform(put("/updateAuthor/{authorId}", 1)
@@ -75,7 +75,7 @@ class AuthorControllerTest {
     @Test
     void testUpdateAuthor_NotFound() throws Exception {
         // Arrange
-        when(authorService.updateAuthor(any(Author.class), eq(1)))
+        when(authorService.updateAuthor(any(AuthorDto.class), eq(1)))
                 .thenThrow(new AuthorNotFoundException("Author with ID 1 not found"));
 
         // Act & Assert
@@ -92,7 +92,7 @@ class AuthorControllerTest {
         doNothing().when(authorService).deleteAuthor(1);
 
         // Act & Assert
-        mockMvc.perform(delete("/{id}", 1))
+        mockMvc.perform(delete("/deleteAuthor/{id}", 1))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string("Author deleted!!"));
 

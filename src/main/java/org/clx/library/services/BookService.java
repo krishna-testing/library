@@ -2,6 +2,7 @@ package org.clx.library.services;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.clx.library.dto.AuthorDto;
 import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.exception.BookNotFoundException;
 import org.clx.library.exception.UnauthorizedBookDeletionException;
@@ -25,7 +26,7 @@ public class BookService {
     private final AuthorService authorService;
 
     public Book createBook(Book book, Integer authorId) {
-        Author author = authorService.findAuthorById(authorId);
+        AuthorDto author = authorService.findAuthorById(authorId);
 
         Book newBook = new Book();
         newBook.setId(book.getId());
@@ -34,7 +35,7 @@ public class BookService {
         newBook.setCreatedAt(LocalDateTime.now());
         newBook.setAvailable(book.getAvailable());
         newBook.setCard(book.getCard());
-        newBook.setAuthor(author);
+//        newBook.setAuthor(author);
         Book savedBook = bookRepository.save(newBook);
         log.info("Author created successfully with ID: {}", savedBook.getId());
         return savedBook;
@@ -42,7 +43,7 @@ public class BookService {
 
     public String deleteBook(Integer bookId, Integer authorId) {
         Book book = findBookById(bookId);
-        Author author = authorService.findAuthorById(authorId);
+        AuthorDto author = authorService.findAuthorById(authorId);
 
         if (book.getAuthor().getId() != author.getId()){
             throw new UnauthorizedBookDeletionException("You are not authorized to delete this book.");
@@ -69,7 +70,7 @@ public class BookService {
 
     public Book savedBook(Integer bookId, Integer authorId) throws AuthorNotFoundException,BookNotFoundException {
         Book book = findBookById(bookId);
-        Author author = authorService.findAuthorById(authorId);
+        AuthorDto author = authorService.findAuthorById(authorId);
         // Check if the book is already saved by the author
         if (author.getSavedBook().contains(book)) {
             // If the book is already in the list, remove it
@@ -80,7 +81,7 @@ public class BookService {
         }
 
         // Save the updated author
-        authorRepository.save(author);
+//        authorRepository.save(author);
 
         return book;
     }

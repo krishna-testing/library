@@ -1,6 +1,7 @@
 package org.clx.library.services;
 
 import lombok.AllArgsConstructor;
+import org.clx.library.dto.AuthorDto;
 import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.model.Author;
 import org.clx.library.repositories.AuthorRepository;
@@ -17,34 +18,56 @@ public class AuthorService {
 
     private final AuthorRepository authorRepository;
 
-    public Author createAuthor(Author author) {
-
-            Author newAuthor = new Author();
-            newAuthor.setId(author.getId());
-            newAuthor.setName(author.getName());
-            newAuthor.setEmail(author.getEmail());
-            newAuthor.setAge(author.getAge());
-            newAuthor.setCountry(author.getCountry());
-            newAuthor.setBooksWritten(author.getBooksWritten());
-
-            Author savedAuthor = authorRepository.save(newAuthor);
-            logger.info("Author created successfully with ID: {}", savedAuthor.getId());
-            return savedAuthor;
-
+    // Map Author entity to AuthorDto
+    private AuthorDto mapToDto(Author author) {
+        AuthorDto authorDto = new AuthorDto();
+        authorDto.setId(author.getId());
+        authorDto.setName(author.getName());
+        authorDto.setEmail(author.getEmail());
+        authorDto.setAge(author.getAge());
+        authorDto.setCountry(author.getCountry());
+        authorDto.setBooksWritten(author.getBooksWritten());
+        authorDto.setSavedBook(author.getSavedBook());
+        return authorDto;
     }
-    public Author findAuthorById(Integer authorId) throws AuthorNotFoundException {
+
+    // Map AuthorDto to Author entity
+    private Author mapToEntity(AuthorDto authorDto) {
+        Author author = new Author();
+        author.setId(authorDto.getId());
+        author.setName(authorDto.getName());
+        author.setEmail(authorDto.getEmail());
+        author.setAge(authorDto.getAge());
+        author.setCountry(authorDto.getCountry());
+        author.setBooksWritten(authorDto.getBooksWritten());
+        author.setSavedBook(authorDto.getSavedBook());
+        return author;
+    }
+
+    public AuthorDto createAuthor(AuthorDto authorDto) {
+        // Convert DTO to entity
+        Author author = mapToEntity(authorDto);
+
+        Author savedAuthor = authorRepository.save(author);
+        logger.info("Author created successfully with ID: {}", savedAuthor.getId());
+
+        // Convert saved entity back to DTO
+        return mapToDto(savedAuthor);
+    }
+
+    public AuthorDto findAuthorById(Integer authorId) throws AuthorNotFoundException {
         logger.info("Received request to find author with ID: {}", authorId);
         Optional<Author> author = authorRepository.findById(authorId);
         if (author.isPresent()) {
             logger.info("Author with ID: {} found", authorId);
-            return author.get();
+            return mapToDto(author.get());
         } else {
             logger.error("Author with ID: {} not found", authorId);
             throw new AuthorNotFoundException("User does not exist with userId: " + authorId);
         }
     }
 
-    public Author updateAuthor(Author author, Integer authorId) throws AuthorNotFoundException {
+    public AuthorDto updateAuthor(AuthorDto authorDto, Integer authorId) throws AuthorNotFoundException {
         logger.info("Received request to update author with ID: {}", authorId);
         Optional<Author> existingAuthor = authorRepository.findById(authorId);
         if (existingAuthor.isEmpty()) {
@@ -52,28 +75,37 @@ public class AuthorService {
             throw new AuthorNotFoundException("User does not exist with ID: " + authorId);
         }
 
-        Author oldAuthor = existingAuthor.get();
-        if (author.getName() != null) {
-            oldAuthor.setName(author.getName());
-            logger.info("Author name updated to: {}", author.getName());
+        Author authorToUpdate = existingAuthor.get();
+
+        // Update fields from DTO if not null
+        if (authorDto.getName() != null) {
+            authorToUpdate.setName(authorDto.getName());
+            logger.info("Author name updated to: {}", authorDto.getName());
         }
-        if (author.getEmail() != null) {
-            oldAuthor.setEmail(author.getEmail());
-            logger.info("Author email updated to: {}", author.getEmail());
+        if (authorDto.getEmail() != null) {
+            authorToUpdate.setEmail(authorDto.getEmail());
+            logger.info("Author email updated to: {}", authorDto.getEmail());
         }
 
-        Author updatedAuthor = authorRepository.save(oldAuthor);
+        Author updatedAuthor = authorRepository.save(authorToUpdate);
         logger.info("Author with ID: {} updated successfully", authorId);
-        return updatedAuthor;
+
+        // Return updated AuthorDto
+        return mapToDto(updatedAuthor);
     }
-    public void updateAuthor(Author author) {
-        logger.info("Request is now received ti update authorRequest for author:{}",author);
+
+    public AuthorDto updateAuthor(AuthorDto authorDto) {
+        logger.info("Request is now received to update author: {}", authorDto);
         try {
+            Author author = mapToEntity(authorDto);
             authorRepository.updateAuthorDetails(author);
-            logger.info("Author details updated successfully for author: {}", author);
+            logger.info("Author details updated successfully for author: {}", authorDto);
+            return authorDto; // Assuming the input DTO is sufficient
         } catch (Exception e) {
             logger.error("Error occurred while updating author details: {}", e.getMessage(), e);
-        }    }
+            return null;
+        }
+    }
 
     public void deleteAuthor(int id) {
         logger.info("Received request to delete author with ID: {}", id);
@@ -82,5 +114,6 @@ public class AuthorService {
             logger.info("Author with ID: {} deleted successfully", id);
         } catch (Exception e) {
             logger.error("Error occurred while deleting author with ID: {}: {}", id, e.getMessage(), e);
-        }    }
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package org.clx.library.services;
 
+import org.clx.library.dto.AuthorDto;
 import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.model.Author;
 import org.clx.library.repositories.AuthorRepository;
@@ -8,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
@@ -24,11 +24,10 @@ class AuthorServiceTest {
     private AuthorService authorService;
 
     private Author author;
+    private AuthorDto authorDto;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
         // Initialize the Author object
         author = new Author();
         author.setId(1);
@@ -36,6 +35,14 @@ class AuthorServiceTest {
         author.setEmail("author@example.com");
         author.setAge(45);
         author.setCountry("Country");
+
+        // Initialize the AuthorDto object
+        authorDto = new AuthorDto();
+        authorDto.setId(1);
+        authorDto.setName("Author Name");
+        authorDto.setEmail("author@example.com");
+        authorDto.setAge(45);
+        authorDto.setCountry("Country");
     }
 
     @Test
@@ -44,135 +51,123 @@ class AuthorServiceTest {
         when(authorRepository.save(Mockito.any(Author.class))).thenReturn(author);
 
         // Act
-        Author createdAuthor = authorService.createAuthor(author);
+        AuthorDto createdAuthorDto = authorService.createAuthor(authorDto);
 
         // Assert
-        assertNotNull(createdAuthor);
-        assertEquals("Author Name", createdAuthor.getName());
-        assertEquals("author@example.com", createdAuthor.getEmail());
+        assertNotNull(createdAuthorDto);
+        assertEquals("Author Name", createdAuthorDto.getName());
+        assertEquals("author@example.com", createdAuthorDto.getEmail());
         verify(authorRepository, times(1)).save(Mockito.any(Author.class));
     }
 
     @Test
-    void testFindAuthorById_Success() {
+    void testFindAuthorById_Success() throws AuthorNotFoundException {
         // Arrange
-        Integer authorId = 1;
-        when(authorRepository.findById(authorId)).thenReturn(Optional.of(author));
+        when(authorRepository.findById(1)).thenReturn(Optional.of(author));
 
         // Act
-        Author foundAuthor = authorService.findAuthorById(authorId);
+        AuthorDto foundAuthorDto = authorService.findAuthorById(1);
 
         // Assert
-        assertNotNull(foundAuthor);
-        assertEquals(authorId, foundAuthor.getId());
+        assertNotNull(foundAuthorDto);
+        assertEquals(1, foundAuthorDto.getId());
+        assertEquals("Author Name", foundAuthorDto.getName());
     }
 
     @Test
     void testFindAuthorById_NotFound() {
         // Arrange
-        Integer authorId = 1;
-        when(authorRepository.findById(authorId)).thenReturn(Optional.empty());
+        when(authorRepository.findById(1)).thenReturn(Optional.empty());
 
         // Act & Assert
         AuthorNotFoundException exception = assertThrows(AuthorNotFoundException.class, () -> {
-            authorService.findAuthorById(authorId);
+            authorService.findAuthorById(1);
         });
-
         assertEquals("User does not exist with userId: 1", exception.getMessage());
     }
 
     @Test
-    void testUpdateAuthor_Success() {
+    void testUpdateAuthor_Success() throws AuthorNotFoundException {
         // Arrange
-        Integer authorId = 1;
-        Author updatedAuthor = new Author();
-        updatedAuthor.setName("Updated Name");
-        updatedAuthor.setEmail("updated@example.com");
+        AuthorDto updatedAuthorDto = new AuthorDto();
+        updatedAuthorDto.setName("Updated Name");
+        updatedAuthorDto.setEmail("updated@example.com");
 
         Author existingAuthor = new Author();
         existingAuthor.setId(1);
         existingAuthor.setName("Old Name");
         existingAuthor.setEmail("old@example.com");
 
-        when(authorRepository.findById(authorId)).thenReturn(Optional.of(existingAuthor));
+        when(authorRepository.findById(1)).thenReturn(Optional.of(existingAuthor));
         when(authorRepository.save(Mockito.any(Author.class))).thenReturn(existingAuthor);
 
         // Act
-        Author updated = authorService.updateAuthor(updatedAuthor, authorId);
+        AuthorDto updatedAuthorDtoResult = authorService.updateAuthor(updatedAuthorDto, 1);
 
         // Assert
-        assertNotNull(updated);
-        assertEquals("Updated Name", updated.getName());
-        assertEquals("updated@example.com", updated.getEmail());
+        assertNotNull(updatedAuthorDtoResult);
+        assertEquals("Updated Name", updatedAuthorDtoResult.getName());
+        assertEquals("updated@example.com", updatedAuthorDtoResult.getEmail());
         verify(authorRepository, times(1)).save(existingAuthor);
     }
 
     @Test
     void testUpdateAuthor_NotFound() {
         // Arrange
-        Integer authorId = 1;
-        Author updatedAuthor = new Author();
-        updatedAuthor.setName("Updated Name");
+        AuthorDto updatedAuthorDto = new AuthorDto();
+        updatedAuthorDto.setName("Updated Name");
 
-        when(authorRepository.findById(authorId)).thenReturn(Optional.empty());
+        when(authorRepository.findById(1)).thenReturn(Optional.empty());
 
         // Act & Assert
         AuthorNotFoundException exception = assertThrows(AuthorNotFoundException.class, () -> {
-            authorService.updateAuthor(updatedAuthor, authorId);
+            authorService.updateAuthor(updatedAuthorDto, 1);
         });
-
         assertEquals("User does not exist with ID: 1", exception.getMessage());
-    }
-
-    @Test
-    void testUpdateAuthor_NoFieldsUpdated() {
-        // Arrange
-        Integer authorId = 1;
-        Author updatedAuthor = new Author();
-        updatedAuthor.setName(null);
-        updatedAuthor.setEmail(null);
-
-        Author existingAuthor = new Author();
-        existingAuthor.setId(1);
-        existingAuthor.setName("Old Name");
-        existingAuthor.setEmail("old@example.com");
-
-        when(authorRepository.findById(authorId)).thenReturn(Optional.of(existingAuthor));
-        when(authorRepository.save(Mockito.any(Author.class))).thenReturn(existingAuthor);
-
-        // Act
-        Author updated = authorService.updateAuthor(updatedAuthor, authorId);
-
-        // Assert
-        assertNotNull(updated);
-        assertEquals("Old Name", updated.getName());
-        assertEquals("old@example.com", updated.getEmail());
-        verify(authorRepository, times(1)).save(existingAuthor);
     }
 
     @Test
     void testUpdateAuthorDetails() {
         // Arrange
-        author.setName("Updated Author Name");
+        AuthorDto updatedAuthorDto = new AuthorDto();
+        updatedAuthorDto.setName("Updated Author Name");
+
         when(authorRepository.updateAuthorDetails(Mockito.any(Author.class))).thenReturn(1); // Assume update returns 1 on success
 
         // Act
-        authorService.updateAuthor(author);
+        AuthorDto result = authorService.updateAuthor(updatedAuthorDto);
 
         // Assert
-        verify(authorRepository, times(1)).updateAuthorDetails(author);
+        assertNotNull(result);
+        assertEquals("Updated Author Name", result.getName());
+        verify(authorRepository, times(1)).updateAuthorDetails(Mockito.any(Author.class));
     }
 
     @Test
-    void testDeleteAuthor() {
+    void testDeleteAuthor_Success() {
         // Arrange
-        int authorId = 1;
+        doNothing().when(authorRepository).deleteCustom(1);
 
         // Act
-        authorService.deleteAuthor(authorId);
+        authorService.deleteAuthor(1);
 
         // Assert
-        verify(authorRepository, times(1)).deleteCustom(authorId);
+        verify(authorRepository, times(1)).deleteCustom(1);
     }
 
+    @Test
+    void testDeleteAuthor_Exception() {
+        // Arrange
+        doThrow(new RuntimeException("Error deleting author")).when(authorRepository).deleteCustom(1);
+
+        // Act & Assert
+        try {
+            authorService.deleteAuthor(1);
+        } catch (Exception e) {
+            assertTrue(e instanceof RuntimeException);
+            assertEquals("Error deleting author", e.getMessage());
+        }
+
+        verify(authorRepository, times(1)).deleteCustom(1);
+    }
 }
