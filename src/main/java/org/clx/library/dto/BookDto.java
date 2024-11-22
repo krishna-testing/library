@@ -1,10 +1,6 @@
 package org.clx.library.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.clx.library.model.Author;
 import org.clx.library.model.Card;
 import org.clx.library.model.Genre;
@@ -26,4 +22,6 @@ public class BookDto {
         private List<Transaction> transactions;
 
 
+        public BookDto(Object o, String bookTitle, String authorName, String genre) {
+        }
 }

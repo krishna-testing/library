@@ -1,35 +1,32 @@
 package org.clx.library.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.clx.library.exception.AuthorNotFoundException;
-import org.clx.library.exception.BookNotFoundException;
-import org.clx.library.exception.UnauthorizedBookDeletionException;
-import org.clx.library.model.Author;
+import org.clx.library.dto.BookDto;
 import org.clx.library.model.Book;
-import org.clx.library.model.Genre;
 import org.clx.library.services.BookService;
+import org.clx.library.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-
-import org.mockito.Mockito;
-
-
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.util.Arrays;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class BookControllerTest {
+@ExtendWith(MockitoExtension.class)
+public class BookControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Mock
     private BookService bookService;
@@ -37,182 +34,146 @@ class BookControllerTest {
     @InjectMocks
     private BookController bookController;
 
-    private MockMvc mockMvc;
-
-    private Book book;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    public void setup() {
+        // Initialize MockMvc and ObjectMapper
         mockMvc = MockMvcBuilders.standaloneSetup(bookController).build();
-
-        // Initialize a sample Book object for testing
-        book = new Book();
-        book.setId(1);
-        book.setName("Test Book");
+        objectMapper = new ObjectMapper();
     }
 
     @Test
-    void testCreateBook_Success() throws Exception {
+    public void testCreateBook_Success() throws Exception {
         // Arrange
-        Integer authorId = 1;
+        BookDto bookDto = new BookDto(null, "Book Title", "Author Name", "Genre");
+        BookDto createdBook = new BookDto(1, "Book Title", "Author Name", "Genre");
 
-        // Create a mock Author
-        Author author = new Author();
-        author.setId(authorId);
-        author.setName("John Doe");
-
-        // Create a Book object
-        Book createdBook = new Book();
-        createdBook.setName("Test Book");
-        createdBook.setGenre(Genre.FICTIONAL);
-        createdBook.setAuthor(author);
-
-        // Mock behavior of bookService.createBook
-        when(bookService.createBook(any(Book.class), eq(authorId)))
-                .thenReturn(createdBook);
+        when(bookService.createBook(bookDto, 123)).thenReturn(createdBook);
 
         // Act and Assert
-        mockMvc.perform(post("/api/createBook")  // Ensure the correct URL is used
-                        .param("authorId", String.valueOf(authorId))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createdBook)))
-                .andExpect(status().isCreated())
-                .andExpect(content().string("Book created with ID: " + createdBook.getId()));
-
-        // Verify the service method was called once with the correct parameters
-        Mockito.verify(bookService, Mockito.times(1)).createBook(any(Book.class), eq(authorId));
+        mockMvc.perform(post("/api/authors/123/books")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(bookDto)))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Book Title"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.author").value("Author Name"));
     }
 
     @Test
-    void testCreateBook_BadRequest_AuthorException() throws Exception {
+    public void testCreateBook_Failure() throws Exception {
         // Arrange
-        Integer authorId = 1;
-        when(bookService.createBook(any(Book.class), eq(authorId)))
-                .thenThrow(new AuthorNotFoundException("Author not found"));
+        BookDto bookDto = new BookDto(null, "Book Title", "Author Name", "Genre");
 
-        Book createdBook = new Book();
-        createdBook.setName("Test Book");
-        createdBook.setGenre(Genre.FICTIONAL);
+        when(bookService.createBook(bookDto, 123)).thenThrow(new RuntimeException("Author not found"));
 
         // Act and Assert
-        mockMvc.perform(post("/api/createBook")
-                        .param("authorId", String.valueOf(authorId))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createdBook)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Author not found"));
-    }
-
-
-    @Test
-    void testDeleteBook_Success() throws Exception {
-        // Arrange
-        Integer bookId = 1;
-        Integer authorId = 1;
-        when(bookService.deleteBook(bookId, authorId)).thenReturn("Post deleted Successfully");
-
-        // Act and Assert
-        mockMvc.perform(delete("/api/deleteBook")
-                        .param("bookId", String.valueOf(bookId))
-                        .param("authorId", String.valueOf(authorId)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Post deleted Successfully"));
-
-        verify(bookService, times(1)).deleteBook(bookId, authorId);
+        mockMvc.perform(post("/api/authors/123/books")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(bookDto)))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.content().string("Author not found"));
     }
 
     @Test
-    void testDeleteBook_BadRequest_Exception() throws Exception {
+    public void testDeleteBook_Success() throws Exception {
         // Arrange
-        Integer bookId = 1;
-        Integer authorId = 1;
-        when(bookService.deleteBook(bookId, authorId)).thenThrow(new UnauthorizedBookDeletionException("Unauthorized"));
+        when(bookService.deleteBook(1, 123)).thenReturn("Book deleted successfully");
 
         // Act and Assert
-        mockMvc.perform(delete("/api/deleteBook")
-                        .param("bookId", String.valueOf(bookId))
-                        .param("authorId", String.valueOf(authorId)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Unauthorized"));
-
-        verify(bookService, times(1)).deleteBook(bookId, authorId);
+        mockMvc.perform(delete("/api/deleteBook?bookId=1&authorId=123"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Book deleted successfully"));
     }
 
     @Test
-    void testGetBooks_Success() throws Exception {
+    public void testDeleteBook_Failure() throws Exception {
         // Arrange
-        List<Book> books = Arrays.asList(book);
-        when(bookService.getBooks(Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString())).thenReturn(books);
+        when(bookService.deleteBook(1, 123)).thenThrow(new RuntimeException("Book not found"));
 
         // Act and Assert
-        mockMvc.perform(get("/api/getBooks")
-                        .param("genre", "Fiction")
-                        .param("isAvailable", "true")
-                        .param("author", "Test Author"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Test Book"));
-
-        verify(bookService, times(1)).getBooks(Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString());
+        mockMvc.perform(delete("/api/deleteBook?bookId=1&authorId=123"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("Book not found"));
     }
 
     @Test
-    void testGetBookById_Success() throws Exception {
+    public void testGetBooks_Success() throws Exception {
         // Arrange
-        Integer bookId = 1;
-        when(bookService.findBookById(bookId)).thenReturn(book);
+        List<Book> books = List.of(new Book(1, "Book 1", "Author 1", "Genre 1"),
+                new Book(2, "Book 2", "Author 2", "Genre 2",));
+        when(bookService.getBooks("Genre 1", true, "Author 1")).thenReturn(books);
 
         // Act and Assert
-        mockMvc.perform(get("/api/getBook/{id}", bookId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Test Book"));
-
-        verify(bookService, times(1)).findBookById(bookId);
+        mockMvc.perform(get("/api/getBooks?genre=Genre 1&isAvailable=true&author=Author 1"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].id").value(2));
     }
 
     @Test
-    void testGetBookById_NotFound() throws Exception {
+    public void testGetBooks_Failure() throws Exception {
         // Arrange
-        Integer bookId = 1;
-        when(bookService.findBookById(bookId)).thenThrow(new BookNotFoundException("Book not found"));
+        when(bookService.getBooks("Genre 1", true, "Author 1")).thenThrow(new RuntimeException("Internal Server Error"));
 
         // Act and Assert
-        mockMvc.perform(get("/api/getBook/{id}", bookId))
-                .andExpect(status().isNotFound());
-
-        verify(bookService, times(1)).findBookById(bookId);
+        mockMvc.perform(get("/api/getBooks?genre=Genre 1&isAvailable=true&author=Author 1"))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.content().string("Internal Server Error"));
     }
 
     @Test
-    void testSaveBook_Success() throws Exception {
+    public void testGetBookById_Success() throws Exception {
         // Arrange
-        Integer bookId = 1;
-        Integer authorId = 1;
-        when(bookService.savedBook(bookId, authorId)).thenReturn(book);
+        BookDto bookDto = new BookDto(1, "Book Title", "Author Name", "Genre");
+
+        when(bookService.findBookById(1)).thenReturn(bookDto);
 
         // Act and Assert
-        mockMvc.perform(put("/api/saveBook/{bookId}", bookId)
-                        .param("authorId", String.valueOf(authorId)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Test Book"));
-
-        verify(bookService, times(1)).savedBook(bookId, authorId);
+        mockMvc.perform(get("/api/posts/1"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Book Title"));
     }
 
     @Test
-    void testSaveBook_BadRequest_Exception() throws Exception {
+    public void testGetBookById_Failure() throws Exception {
         // Arrange
-        Integer bookId = 1;
-        Integer authorId = 1;
-        when(bookService.savedBook(bookId, authorId)).thenThrow(new BookNotFoundException("Invalid operation"));
+        when(bookService.findBookById(1)).thenThrow(new ResourceNotFoundException("Book not found"));
 
         // Act and Assert
-        mockMvc.perform(put("/api/saveBook/{bookId}", bookId)
-                        .param("authorId", String.valueOf(authorId)))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/posts/1"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+    }
 
-        verify(bookService, times(1)).savedBook(bookId, authorId);
+    @Test
+    public void testUpdateBook_Success() throws Exception {
+        // Arrange
+        BookDto bookDto = new BookDto(1, "Updated Book Title", "Updated Author", "Updated Genre");
+        when(bookService.updateBook(bookDto, 1)).thenReturn(bookDto);
+
+        // Act and Assert
+        mockMvc.perform(put("/api/book/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(bookDto)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Updated Book Title"));
+    }
+
+    @Test
+    public void testUpdateBook_Failure() throws Exception {
+        // Arrange
+        BookDto bookDto = new BookDto(1, "Updated Book Title", "Updated Author", "Updated Genre");
+        when(bookService.updateBook(bookDto, 1)).thenThrow(new RuntimeException("Book not found"));
+
+        // Act and Assert
+        mockMvc.perform(put("/api/book/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(bookDto)))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.content().string("Book not found"));
     }
 }

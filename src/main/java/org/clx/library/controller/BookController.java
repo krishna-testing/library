@@ -1,8 +1,10 @@
 package org.clx.library.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.clx.library.dto.BookDto;
 import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.exception.BookNotFoundException;
+import org.clx.library.exception.ResourceNotFoundException;
 import org.clx.library.model.Book;
 import org.clx.library.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 @RestController
 @Slf4j
@@ -26,18 +27,18 @@ public class BookController {
     }
 
     // Create a new Book
-    @PostMapping("/createBook")
-    public ResponseEntity<String> createBook(@RequestBody Book book, @RequestParam Integer authorId) {
-        log.info("Received request to create book with authorId: {}", authorId);
-        try {
-            Book createdBook = bookService.createBook(book, authorId);
-            log.info("Book created successfully with ID: {}", createdBook.getId());
-            return new ResponseEntity<>("Book created with ID: " + createdBook.getId(), HttpStatus.CREATED);
-        }catch (AuthorNotFoundException ex){
-            log.error("Failed to create book: Author with ID {} not found", authorId);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @PostMapping("/authors/{authorId}/books")
+    public ResponseEntity<BookDto> createBook(@RequestBody BookDto bookDto, @PathVariable int authorId) {
+        log.info("Received request to create book with authorId: {}, BookDto: {}", authorId, bookDto);
 
+        try {
+            BookDto createBook = this.bookService.createBook(bookDto, authorId);
+            log.info("Book created successfully with ID: {}", createBook.getId());
+            return new ResponseEntity<>(createBook, HttpStatus.CREATED);
+        } catch (Exception e) {
+            log.error("Failed to create book with authorId: {}, BookDto: {}. Error: {}", authorId, bookDto, e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // Delete a Book by ID (and ensure it's the author's book)
@@ -49,7 +50,7 @@ public class BookController {
             log.info("Book with ID: {} deleted successfully", bookId);
             return new ResponseEntity<>(message, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Failed to delete book with ID: {}: {}", bookId, e.getMessage());
+            log.error("Failed to delete book with ID: {}. Error: {}", bookId, e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
@@ -58,39 +59,47 @@ public class BookController {
     @GetMapping("/getBooks")
     public ResponseEntity<List<Book>> getBooks(
             @RequestParam(required = false) String genre,
-            @RequestParam(required = false,defaultValue = "true") Boolean isAvailable,
+            @RequestParam(required = false, defaultValue = "true") Boolean isAvailable,
             @RequestParam(required = false) String author) {
         log.info("Received request to get books with parameters - Genre: {}, Available: {}, Author: {}", genre, isAvailable, author);
-        List<Book> books = bookService.getBooks(genre, isAvailable, author);
-        log.info("Returning {} books", books.size());
-        return new ResponseEntity<>(books, HttpStatus.OK);
-    }
-
-    // Get book by ID
-    @GetMapping("/getBook/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable Integer id) {
-        log.info("Received request to get book with ID: {}", id);
         try {
-            Book book = bookService.findBookById(id);
-            log.info("Book with ID: {} found", id);
-            return new ResponseEntity<>(book, HttpStatus.OK);
-        } catch (BookNotFoundException e) {
-            log.error("Book with ID: {} not found", id);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            List<Book> books = bookService.getBooks(genre, isAvailable, author);
+            log.info("Returning {} books", books.size());
+            return new ResponseEntity<>(books, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Failed to retrieve books. Error: {}", e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // Save/Remove a book from an author's saved books
-    @PutMapping("/saveBook/{bookId}")
-    public ResponseEntity<Book> saveBook(@PathVariable Integer bookId, @RequestParam Integer authorId) {
-        log.info("Received request to save book with ID: {} for authorId: {}", bookId, authorId);
+    // Get a book by its ID
+    @GetMapping("/posts/{bookId}")
+    public ResponseEntity<BookDto> getBookById(@PathVariable Integer bookId) {
+        log.info("Received request to get book with ID: {}", bookId);
         try {
-            Book updatedBook = bookService.savedBook(bookId, authorId);
-            log.info("Book with ID: {} saved successfully", bookId);
+            BookDto bookDto = this.bookService.findBookById(bookId);
+            log.info("Book with ID: {} found", bookId);
+            return new ResponseEntity<>(bookDto, HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            log.error("Book with ID: {} not found. Error: {}", bookId, e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            log.error("Unexpected error occurred while fetching book with ID: {}. Error: {}", bookId, e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Update a book by its ID
+    @PutMapping("/book/{bookId}")
+    public ResponseEntity<BookDto> updateBook(@RequestBody BookDto bookDto, @PathVariable Integer bookId) {
+        log.info("Received request to update book with ID: {}. Updated BookDto: {}", bookId, bookDto);
+        try {
+            BookDto updatedBook = this.bookService.updateBook(bookDto, bookId);
+            log.info("Book with ID: {} updated successfully", bookId);
             return new ResponseEntity<>(updatedBook, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Failed to save book with ID: {}: {}", bookId, e.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            log.error("Failed to update book with ID: {}. Error: {}", bookId, e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

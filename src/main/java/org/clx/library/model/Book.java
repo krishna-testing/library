@@ -25,12 +25,12 @@ public class Book {
     @ManyToOne
     @JoinColumn
     @JsonIgnore
-    Author author;
+    private Author author;
 
     @ManyToOne
     @JoinColumn
     @JsonIgnore
-    Card card;
+    private Card card;
 
     @Column(columnDefinition = "TINYINT(1)")
     private boolean available;
