@@ -4,9 +4,6 @@ import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,12 +15,14 @@ public class ApiResponse {
     private String message;
     private Object data;
 
-    public ResponseEntity<?> create(){
-        Map<String,Object> response = new LinkedHashMap<>();
-        response.put("status",status);
-        response.put("message",message);
-        response.put("data",data);
+    public ApiResponse(HttpStatus httpStatus, String message, Object data) {
+        this.status=httpStatus.value();
+        this.message=message;
+        this.data=data;
+    }
 
-        return new ResponseEntity<>(response, HttpStatus.valueOf(status));
+    public ResponseEntity<ApiResponse> create(){
+
+        return new ResponseEntity<>(this, HttpStatus.valueOf(status));
     }
 }
