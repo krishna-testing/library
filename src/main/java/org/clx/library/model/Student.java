@@ -19,7 +19,7 @@ public class Student {
     private String emailId;
     private String name;
     //Future scope adult books filter
-    private int age;
+    private Integer age;
     private String country;
     @OneToOne
     @JoinColumn
@@ -37,7 +37,7 @@ public class Student {
         this.emailId = emailId;
     }
 
-    public Student(String emailId, String name, int age, String country) {
+    public Student(String emailId, String name, Integer age, String country) {
         this.emailId = emailId;
         this.name = name;
         this.age = age;

@@ -28,12 +28,11 @@ public interface StudentRepository extends JpaRepository<Student,Integer> {
     void deleteCustom(@Param("id") int id);
 
 
+
     @Modifying
     @Transactional
-    @Query("UPDATE Student s SET s.name = :#{#student.name}, s.emailId = :#{#student.emailId}, " +
-            "s.age = :#{#student.age}, s.country = :#{#student.country} WHERE s.id = :#{#student.id}")
-    void updateStudentDetails(@Param("student") Student student);
-
+    @Query("UPDATE Student s SET s.name = :#{#student.name}, s.age = :#{#student.age}, s.country = :#{#student.country} WHERE s.id = :studentId")
+    void updateStudentDetails(@Param("student") Student student, @Param("studentId") int studentId);
     //find student by given name
     //Terminal---> Select * from student where email =email
     //1. JPQL--Dealing with java objects

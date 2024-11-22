@@ -9,11 +9,13 @@ public class CommonUtil {
     private CommonUtil() {
     }
 
-    public static ResponseEntity<?> createBuildResponse(HttpStatusCode status, String message, Object object){
+    public static ResponseEntity<ApiResponse> createBuildResponse(HttpStatusCode status, String message, Object object){
         ApiResponse response = new ApiResponse();
         response.setStatus(status.value());
         response.setMessage(message);
         response.setData(object);
         return response.create();
     }
+
+
 }

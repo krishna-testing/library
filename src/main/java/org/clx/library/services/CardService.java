@@ -2,6 +2,7 @@ package org.clx.library.services;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.clx.library.exception.ResourceNotFoundException;
 import org.clx.library.model.Card;
 import org.clx.library.model.CardStatus;
 import org.clx.library.model.Student;
@@ -27,7 +28,8 @@ public class CardService {
     }
 
     public void deactivate(int studentId) {
+        Card card = cardRepository.findById(studentId).orElseThrow(() -> new ResourceNotFoundException("student", "id", studentId));
         cardRepository.deactivateCard(studentId, CardStatus.DEACTIVATED);
-        log.info("Card successfully deactivated for student with ID: {}", studentId);
+        log.info("Card successfully deactivated for student with ID: {}", card.getStudent().getId());
     }
 }
