@@ -2,6 +2,7 @@ package org.clx.library.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.clx.library.exception.ResourceNotFoundException;
 import org.clx.library.payload.ApiResponse;
 import org.clx.library.services.TransactionService;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,7 @@ public class TransactionController {
             ApiResponse response = new ApiResponse(HttpStatus.OK, "Your Transaction was successful. Here is your Txn ID: " + transactionId, null);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Failed to issue book with ID: {} to card ID: {}. Error: {}", bookId, cardId, e.getMessage(), e);
+            log.error("Failed to issue book with ID: {} to card ID: {}. Error: {}", bookId, cardId, e.getMessage());
             ApiResponse response = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR, "failed", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -47,7 +48,7 @@ public class TransactionController {
             ApiResponse response = new ApiResponse(HttpStatus.OK, "Your Transaction was Successful here is your Txn id:" + transactionId, null);
             return new ResponseEntity<>(response,HttpStatus.OK);
         }catch (Exception e){
-            log.error("Failed to return book with ID: {} for card ID: {}. Error: {}", bookId, cardId, e.getMessage(), e);
+            log.error("Failed to return book with ID: {} for card ID: {}. Error: {}", bookId, cardId, e.getMessage());
             ApiResponse response = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR, "failed", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }

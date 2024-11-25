@@ -16,7 +16,7 @@ public class AuthorRequest {
 
 
 
-    public Author authorRequestToAuthor(AuthorRequest authorRequest){
+    public Author authorRequestToAuthor(){
         Author author= new Author();
         author.setName(name);
         author.setEmail(email);

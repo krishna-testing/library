@@ -80,10 +80,8 @@ public class BookService {
     public BookDto updateBook(BookDto bookDto, int bookId) {
         Book book = this.bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("post", "POST_ID_FIELD", bookId));
-        book.setAuthor(bookDto.getAuthor());
         book.setName(bookDto.getName());
         book.setGenre(bookDto.getGenre());
-        book.setCard(bookDto.getCard());
         book.setCreatedAt(LocalDateTime.now());
         Book updatedBook = this.bookRepository.save(book);
         return this.modelMapper.map(updatedBook, BookDto.class);

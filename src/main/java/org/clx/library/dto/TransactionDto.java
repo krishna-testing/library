@@ -1,10 +1,12 @@
 package org.clx.library.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.clx.library.model.Book;
 import org.clx.library.model.Transaction;
 import org.clx.library.model.TransactionStatus;
 
@@ -23,6 +25,7 @@ public class TransactionDto {
 
     private int fineAmount;
 
+    @JsonIgnore
     private BookDto bookDto;
 
     @Column(columnDefinition = "TINYINT(1)")
@@ -38,7 +41,7 @@ public class TransactionDto {
         transaction.setId(id);
         transaction.setTransactionId(transactionId);
         transaction.setFineAmount(fineAmount);
-        transaction.setBook(bookDto);
+//        transaction.setBook(bookDto.bookDtoToBook());
         transaction.setIsIssueOperation(isIssueOperation);
         transaction.setTransactionStatus(transactionStatus);
         transaction.setTransactionDate(transactionDate);
@@ -50,7 +53,8 @@ public class TransactionDto {
         transactionDto.setId(transaction.getId());
         transactionDto.setTransactionId(transaction.getTransactionId());
         transactionDto.setFineAmount(transaction.getFineAmount());
-        transactionDto.setBookDto(transaction.getBook());
+//        Book book = transaction.getBook();
+//        transactionDto.setBookDto(BookDto.bookToBookDto(book));
         transactionDto.setIsIssueOperation(transaction.getIsIssueOperation());
         transactionDto.setTransactionStatus(transaction.getTransactionStatus());
         transactionDto.setTransactionDate(transaction.getTransactionDate());

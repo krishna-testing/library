@@ -31,7 +31,7 @@ public class StudentController {
         try {
             studentService.createStudent(studentRequest);
             log.info("student created successfully");
-            ApiResponse response = new ApiResponse(HttpStatus.OK, "Student Successfully added to the system", null);
+            ApiResponse response = new ApiResponse(HttpStatus.CREATED, "Student Successfully added to the system", null);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         }catch (Exception e){
             ApiResponse response = new ApiResponse(HttpStatus.NOT_ACCEPTABLE, MESSAGE, e.getMessage());
@@ -42,7 +42,7 @@ public class StudentController {
     }
 
     @PutMapping("/updateStudent/{studentId}")
-    public ResponseEntity<ApiResponse> updateStudent(@RequestBody StudentRequest studentRequest, @PathVariable int studentId){
+    public ResponseEntity<ApiResponse> updateStudent(@Valid @RequestBody StudentRequest studentRequest, @PathVariable int studentId){
         try{
             studentService.updateStudent(studentRequest,studentId);
             log.info("student updated successfully");
@@ -69,7 +69,7 @@ public class StudentController {
 
     }
 
-    @GetMapping("/getStudentById")
+    @GetMapping("/getStudentById/{id}")
     public ResponseEntity<StudentDto> getStudentById(@PathVariable("id") int studentId) {
         StudentDto studentDto = studentService.getStudentById(studentId);
         log.info("student get with studentId : {}",studentDto.getId());

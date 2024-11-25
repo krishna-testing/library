@@ -19,7 +19,7 @@ public class AuthorDto {
     private List<BookDto> booksWritten;
 
     // Map Author entity to AuthorDto
-    public static AuthorDto mapToDto(Author author) {
+    public AuthorDto mapToDto(Author author) {
         AuthorDto authorDto = new AuthorDto();
         authorDto.setId(author.getId());
         authorDto.setName(author.getName());

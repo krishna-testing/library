@@ -20,12 +20,9 @@ public class AuthorService {
     private final AuthorRepository authorRepository;
 
 
-
-
     public AuthorRequest createAuthor(AuthorRequest authorRequest) {
-        // Convert DTO to entity
-//        Author author = mapToEntity(authorDto);
-        Author author = authorRequest.authorRequestToAuthor(authorRequest);
+
+        Author author = authorRequest.authorRequestToAuthor();
         Author savedAuthor = authorRepository.save(author);
         logger.info("Author created successfully with ID: {}", savedAuthor.getId());
 
@@ -37,7 +34,8 @@ public class AuthorService {
         Optional<Author> author = authorRepository.findById(authorId);
         if (author.isPresent()) {
             logger.info("Author with ID: {} found", authorId);
-            return mapToDto(author.get());
+            AuthorDto authorDto = new AuthorDto();
+            return authorDto.mapToDto(author.get());
         } else {
             logger.error("Author with ID: {} not found", authorId);
             throw new AuthorNotFoundException("User does not exist with userId: " + authorId);
@@ -68,13 +66,13 @@ public class AuthorService {
         logger.info("Author with ID: {} updated successfully", authorId);
 
         // Return updated AuthorDto
-        return mapToDto(updatedAuthor);
+        return authorDto.mapToDto(updatedAuthor);
     }
 
     public AuthorDto updateAuthor(AuthorDto authorDto) {
         logger.info("Request is now received to update author: {}", authorDto);
         try {
-            Author author = mapToEntity(authorDto);
+            Author author = AuthorDto.mapToEntity(authorDto);
             authorRepository.updateAuthorDetails(author);
             logger.info("Author details updated successfully for author: {}", authorDto);
             return authorDto; // Assuming the input DTO is sufficient

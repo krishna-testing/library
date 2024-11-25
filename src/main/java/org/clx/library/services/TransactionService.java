@@ -89,44 +89,62 @@ public class TransactionService {
         return transaction.getTransactionId();
     }
 
-    public String returnBooks(int cardId,int bookId){
+    public String returnBooks(int cardId, int bookId) {
         log.info("Attempting to return book with ID: {} for card ID: {}", bookId, cardId);
 
-        cardRepository.findById(cardId).orElseThrow(()-> new ResourceNotFoundException("card","id",cardId));
-        bookRepository.findById(bookId).orElseThrow(()-> new ResourceNotFoundException("book","id",bookId));
+        // Validate if the card and book exist
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardId));
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResourceNotFoundException("Book", "id", bookId));
 
-        List<Transaction> transactions=transactionRepository.findByCard_Book(cardId,bookId,TransactionStatus.SUCCESSFUL,true);
-        Transaction lastIssueTransaction=transactions.getLast();
-        //Last transaction that has been done
-        Date issueDate=lastIssueTransaction.getTransactionDate();
-        long issueTime=Math.abs(issueDate.getTime()-System.currentTimeMillis());
-        long numberOfDaysPassed= TimeUnit.DAYS.convert(issueTime,TimeUnit.MILLISECONDS);
-        int fine=0;
-        if (numberOfDaysPassed>maxDaysAllowed){
-            fine=(int)Math.abs(numberOfDaysPassed-maxDaysAllowed)*finePerDay;
+        // Fetch active issue transactions for the given card and book
+        List<Transaction> transactions = transactionRepository.findByCard_Book(cardId, bookId, TransactionStatus.SUCCESSFUL, true);
+
+        // Check if no valid issue transactions exist
+        if (transactions == null || transactions.isEmpty()) {
+            log.error("No active issue transaction found for book ID: {} and card ID: {}. Cannot proceed with return.", bookId, cardId);
+            throw new IllegalArgumentException("Book with ID " + bookId + " was not issued to card ID " + cardId + ". Cannot return.");
+        }
+
+        // Get the last transaction
+        Transaction lastTransaction = transactions.get(transactions.size() - 1);
+
+        // Ensure the last transaction is an issue operation
+        if (!lastTransaction.getIsIssueOperation()) {
+            log.error("The last transaction for book ID: {} and card ID: {} is not an issue operation. Cannot return.", bookId, cardId);
+            throw new IllegalArgumentException("Book with ID " + bookId + " has already been returned. Cannot return again.");
+        }
+
+        // Calculate fine if the book is returned late
+        Date issueDate = lastTransaction.getTransactionDate();
+        long issueTime = Math.abs(issueDate.getTime() - System.currentTimeMillis());
+        long numberOfDaysPassed = TimeUnit.DAYS.convert(issueTime, TimeUnit.MILLISECONDS);
+        int fine = 0;
+        if (numberOfDaysPassed > maxDaysAllowed) {
+            fine = (int) (numberOfDaysPassed - maxDaysAllowed) * finePerDay;
             log.info("Late return detected. Days passed: {}, Fine: {}", numberOfDaysPassed, fine);
         }
-        Card card=lastIssueTransaction.getCard();
-        Book book=lastIssueTransaction.getBook();
+
+        // Update the book's availability
         book.setCard(null);
         book.setAvailable(true);
-        bookRepository.updateBook(book);
+        bookRepository.save(book);
         log.info("Book with ID: {} has been successfully returned and updated.", bookId);
 
-        // Create a return transaction
-        Transaction newTransaction=new Transaction();
+        // Create a new return transaction
+        Transaction newTransaction = new Transaction();
         newTransaction.setBook(book);
         newTransaction.setCard(card);
         newTransaction.setFineAmount(fine);
         newTransaction.setIsIssueOperation(false);
         newTransaction.setTransactionStatus(TransactionStatus.SUCCESSFUL);
+        newTransaction.setTransactionDate(new Date());
         transactionRepository.save(newTransaction);
+
         log.info("Return transaction successful. Transaction ID: {}", newTransaction.getTransactionId());
         return newTransaction.getTransactionId();
     }
-
-
-
 
 
 }
