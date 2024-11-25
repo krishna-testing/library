@@ -7,7 +7,8 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -27,8 +28,7 @@ public class Author {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Book> booksWritten;
 
-   @ManyToMany
-   @JsonIgnore
+    @ManyToMany
     private List<Book> savedBook = new ArrayList<>();
 
 }

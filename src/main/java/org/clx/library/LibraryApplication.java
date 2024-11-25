@@ -13,7 +13,8 @@ public class LibraryApplication {
 		SpringApplication.run(LibraryApplication.class, args);
 	}
 	@Bean
-	public ModelMapper modelMapper() {
+	public ModelMapper modelMapper(){
 		return new ModelMapper();
 	}
+
 }

@@ -19,31 +19,8 @@ public class AuthorService {
 
     private final AuthorRepository authorRepository;
 
-    // Map Author entity to AuthorDto
-    private AuthorDto mapToDto(Author author) {
-        AuthorDto authorDto = new AuthorDto();
-        authorDto.setId(author.getId());
-        authorDto.setName(author.getName());
-        authorDto.setEmail(author.getEmail());
-        authorDto.setAge(author.getAge());
-        authorDto.setCountry(author.getCountry());
-        authorDto.setBooksWritten(author.getBooksWritten());
-        authorDto.setSavedBook(author.getSavedBook());
-        return authorDto;
-    }
 
-    // Map AuthorDto to Author entity
-    private Author mapToEntity(AuthorDto authorDto) {
-        Author author = new Author();
-        author.setId(authorDto.getId());
-        author.setName(authorDto.getName());
-        author.setEmail(authorDto.getEmail());
-        author.setAge(authorDto.getAge());
-        author.setCountry(authorDto.getCountry());
-        author.setBooksWritten(authorDto.getBooksWritten());
-        author.setSavedBook(authorDto.getSavedBook());
-        return author;
-    }
+
 
     public AuthorRequest createAuthor(AuthorRequest authorRequest) {
         // Convert DTO to entity

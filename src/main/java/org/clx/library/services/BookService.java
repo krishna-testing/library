@@ -21,9 +21,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Pageable;
-
 
 
 @Service
@@ -35,12 +35,10 @@ public class BookService {
     private final AuthorService authorService;
     private ModelMapper modelMapper;
 
-
     public BookDto createBook(BookDto bookDto, int authorId) {
 
         Author author = this.authorRepository.findById(authorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author ", "Author id", authorId));
-
 
 
         Book book = this.modelMapper.map(bookDto, Book.class);
@@ -79,7 +77,6 @@ public class BookService {
     }
 
 
-
     public BookDto updateBook(BookDto bookDto, int bookId) {
         Book book = this.bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("post", "POST_ID_FIELD", bookId));
@@ -91,7 +88,6 @@ public class BookService {
         Book updatedBook = this.bookRepository.save(book);
         return this.modelMapper.map(updatedBook, BookDto.class);
     }
-
 
 
     public BookResponse findAllBook(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
