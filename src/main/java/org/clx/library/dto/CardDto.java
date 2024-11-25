@@ -7,8 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.clx.library.model.Card;
 import org.clx.library.model.CardStatus;
+import org.clx.library.model.Transaction;
 
 import java.sql.Date;
+import java.util.Collections;
 import java.util.List;
 
 @Setter
@@ -36,7 +38,11 @@ public class CardDto {
         card.setCreatedOn(createdOn);
         card.setUpdatedOn(updatedOn);
         card.setCardStatus(cardStatus);
-        card.setTransactions(transactionDtoList);
+
+        List<Transaction> transactionList = transactionDtoList.stream()
+                .map(TransactionDto::transactionDtoToTransaction)
+                .toList();
+        card.setTransactions(transactionList);
         card.setBooks(bookDtoList);
         return card;
     }
@@ -47,7 +53,14 @@ public class CardDto {
         cardDto.setCreatedOn(card.getCreatedOn());
         cardDto.setUpdatedOn(card.getUpdatedOn());
         cardDto.setCardStatus(card.getCardStatus());
-        cardDto.setTransactionDtoList(card.getTransactions());
+
+        List<TransactionDto> list = card.getTransactions() == null ?
+                Collections.emptyList() :
+                card.getTransactions().stream()
+                        .map(TransactionDto::transactionToTransactionDto)
+                        .toList();
+
+        cardDto.setTransactionDtoList(list);
         cardDto.setBookDtoList(card.getBooks());
         return cardDto;
     }
