@@ -1,6 +1,5 @@
 package org.clx.library.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 public class Author {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

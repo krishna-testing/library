@@ -3,7 +3,7 @@ package org.clx.library.services;
 import lombok.AllArgsConstructor;
 import org.clx.library.dto.AuthorDto;
 import org.clx.library.dto.AuthorRequest;
-import org.clx.library.exception.AuthorNotFoundException;
+import org.clx.library.exception.ResourceNotFoundException;
 import org.clx.library.model.Author;
 import org.clx.library.repositories.AuthorRepository;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class AuthorService {
         return authorRequest;
     }
 
-    public AuthorDto findAuthorById(Integer authorId) throws AuthorNotFoundException {
+    public AuthorDto findAuthorById(Integer authorId) throws ResourceNotFoundException {
         logger.info("Received request to find author with ID: {}", authorId);
         Optional<Author> author = authorRepository.findById(authorId);
         if (author.isPresent()) {
@@ -38,16 +38,16 @@ public class AuthorService {
             return authorDto.mapToDto(author.get());
         } else {
             logger.error("Author with ID: {} not found", authorId);
-            throw new AuthorNotFoundException("User does not exist with userId: " + authorId);
+            throw new ResourceNotFoundException("Author","id",authorId);
         }
     }
 
-    public AuthorDto updateAuthor(AuthorDto authorDto, Integer authorId) throws AuthorNotFoundException {
+    public AuthorDto updateAuthor(AuthorDto authorDto, Integer authorId) throws ResourceNotFoundException {
         logger.info("Received request to update author with ID: {}", authorId);
         Optional<Author> existingAuthor = authorRepository.findById(authorId);
         if (existingAuthor.isEmpty()) {
             logger.error("Author with ID: {} not found. Cannot update.", authorId);
-            throw new AuthorNotFoundException("User does not exist with ID: " + authorId);
+            throw new ResourceNotFoundException("Author","id",authorId);
         }
 
         Author authorToUpdate = existingAuthor.get();

@@ -6,10 +6,12 @@ import org.clx.library.model.Book;
 
 import java.util.ArrayList;
 import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class AuthorDto {
     private int id;
     private String name;
@@ -31,13 +33,7 @@ public class AuthorDto {
 
     // Map AuthorDto to Author entity
     public static Author mapToEntity(AuthorDto authorDto) {
-        Author author = new Author();
-        author.setId(authorDto.getId());
-        author.setName(authorDto.getName());
-        author.setEmail(authorDto.getEmail());
-        author.setAge(authorDto.getAge());
-        author.setCountry(authorDto.getCountry());
-        return author;
+       return Author.builder().id(authorDto.getId()).name(authorDto.getName()).email(authorDto.getEmail()).age(authorDto.getAge()).country(authorDto.getCountry()).build();
     }
 
 }

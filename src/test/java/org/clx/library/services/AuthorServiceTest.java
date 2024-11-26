@@ -1,7 +1,6 @@
 package org.clx.library.services;
 
 import org.clx.library.dto.AuthorDto;
-import org.clx.library.exception.AuthorNotFoundException;
 import org.clx.library.model.Author;
 import org.clx.library.repositories.AuthorRepository;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,6 +1,5 @@
 package org.clx.library.services;
 
-import org.clx.library.exception.StudentNotFoundException;
 import org.clx.library.model.Student;
 import org.clx.library.repositories.CardRepository;
 import org.clx.library.repositories.StudentRepository;
