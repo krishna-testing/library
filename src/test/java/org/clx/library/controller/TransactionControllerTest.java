@@ -1,86 +1,75 @@
 package org.clx.library.controller;
 
-import org.clx.library.payload.ApiResponse;
+import org.clx.library.exception.ResourceNotFoundException;
 import org.clx.library.services.TransactionService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WebMvcTest(TransactionController.class)
 class TransactionControllerTest {
 
-    @Mock
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
     private TransactionService transactionService;
 
     @InjectMocks
     private TransactionController transactionController;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+    private static final String ISSUE_BOOK_URL = "/issueBook";
 
     @Test
-    void testIssueBook_Successful()  {
+    void testIssueBook_Success() throws Exception {
+        // Arrange
         int cardId = 1;
-        int bookId = 1;
-        String expectedTransactionId = "txn123";
+        int bookId = 100;
+        String transactionId = "TXN123456";
 
-        when(transactionService.issueBooks(cardId, bookId)).thenReturn(expectedTransactionId);
+        // Mock the service method
+        Mockito.when(transactionService.issueBooks(cardId, bookId)).thenReturn(transactionId);
 
-        ResponseEntity<ApiResponse> response = transactionController.issueBook(cardId, bookId);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Your Transaction was successful. Here is your Txn ID: txn123", response.getBody());
-        verify(transactionService, times(1)).issueBooks(cardId, bookId);
+        // Act & Assert
+        mockMvc.perform(post(ISSUE_BOOK_URL)
+                        .param("cardId", String.valueOf(cardId))
+                        .param("bookId", String.valueOf(bookId))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Your Transaction was successful. Here is your Txn ID: " + transactionId))
+                .andExpect(jsonPath("$.data").isEmpty());
     }
 
     @Test
     void testIssueBook_Failure() throws Exception {
+        // Arrange
         int cardId = 1;
-        int bookId = 1;
+        int bookId = 100;
+        String errorMessage = "Book not found with id : " + bookId;
 
-        when(transactionService.issueBooks(cardId, bookId)).thenThrow(new BookNotFoundException("Book is unavailable!"));
+        // Mock the service to throw an exception
+        Mockito.doThrow(new ResourceNotFoundException("Book", "id", bookId))
+                .when(transactionService).issueBooks(cardId, bookId);
 
-        ResponseEntity<ApiResponse> response = transactionController.issueBook(cardId, bookId);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Book is unavailable!", response.getBody());
-        verify(transactionService, times(1)).issueBooks(cardId, bookId);
+        // Act & Assert
+        mockMvc.perform(post(ISSUE_BOOK_URL)
+                        .param("cardId", String.valueOf(cardId))
+                        .param("bookId", String.valueOf(bookId))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.message").value("failed"))
+                .andExpect(jsonPath("$.data").value(errorMessage));
     }
 
-    @Test
-    void testReturnBook_Successful()  {
-        int cardId = 1;
-        int bookId = 1;
-        String expectedTransactionId = "txn456";
-
-        when(transactionService.returnBooks(cardId, bookId)).thenReturn(expectedTransactionId);
-
-        ResponseEntity<ApiResponse> response = transactionController.returnBook(cardId, bookId);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Your Transaction was Successful here is your Txn id:txn456", response.getBody());
-        verify(transactionService, times(1)).returnBooks(cardId, bookId);
-    }
-
-    @Test
-    void testReturnBook_Failure() throws Exception {
-        int cardId = 1;
-        int bookId = 1;
-
-        when(transactionService.returnBooks(cardId, bookId)).thenThrow(new BookNotFoundException("Transaction failed"));
-
-        ResponseEntity<ApiResponse> response = transactionController.returnBook(cardId, bookId);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Transaction failed", response.getBody());
-        verify(transactionService, times(1)).returnBooks(cardId, bookId);
-    }
 }

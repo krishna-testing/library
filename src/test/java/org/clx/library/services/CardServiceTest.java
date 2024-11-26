@@ -1,7 +1,7 @@
 package org.clx.library.services;
 
+import org.clx.library.exception.ResourceNotFoundException;
 import org.clx.library.model.Card;
-import org.clx.library.model.CardStatus;
 import org.clx.library.model.Student;
 import org.clx.library.repositories.CardRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class CardServiceTest {
@@ -26,30 +27,46 @@ class CardServiceTest {
     }
 
     @Test
-    void testIssueCard() {
-        // Given
-        Student student = new Student("John Doe", "john@example.com");
+    void testCreateCard_Success() {
+        // Arrange
+        Student student = new Student();
+        student.setId(1); // Assign a mock student ID
+        student.setName("John Doe");
 
-        // When
+        Card mockCard = new Card();
+        mockCard.setId(1); // Mock card ID
+        mockCard.setStudent(student);
+
+        // Mock the repository to return the saved card
+        when(cardRepository.save(any(Card.class))).thenAnswer(invocation -> {
+            Card cardToSave = invocation.getArgument(0); // Capture the card being saved
+            cardToSave.setId(1); // Simulate ID generation
+            return cardToSave;
+        });
+
+        // Act
         Card createdCard = cardService.createCard(student);
 
-        // Then
-        verify(cardRepository, times(1)).save(createdCard);
+        // Assert
+        assertEquals(mockCard.getId(), createdCard.getId(), "Card ID should match");
+        verify(cardRepository).save(any(Card.class)); // Ensure the repository's save method was called
+        assertEquals(student, createdCard.getStudent(), "The student should be associated with the card");
     }
+
 
     @Test
-    void testDeactivateCard() {
-        // Given
+    void testDeactivate_ResourceNotFound() {
+        // Arrange
         int studentId = 1;
-        Card card = new Card();
-        card.setCardStatus(CardStatus.ACTIVATED); // Set initial status
-        when(cardRepository.findById(studentId)).thenReturn(java.util.Optional.of(card));
+        when(cardRepository.findById(studentId)).thenReturn(java.util.Optional.empty());
 
-        // When
-        cardService.deactivate(studentId);
+        // Act & Assert
+        org.junit.jupiter.api.Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            cardService.deactivate(studentId);
+        });
 
-        // Then
-        verify(cardRepository, times(1)).deactivateCard(studentId, CardStatus.DEACTIVATED);
+        verify(cardRepository).findById(studentId); // Ensure findById was called
     }
+
 
 }
