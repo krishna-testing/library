@@ -111,7 +111,7 @@ public class TransactionService {
         Transaction lastTransaction = transactions.get(transactions.size() - 1);
 
         // Ensure the last transaction is an issue operation
-        if (!lastTransaction.getIsIssueOperation()) {
+        if (Boolean.FALSE.equals(lastTransaction.getIsIssueOperation())) {
             log.error("The last transaction for book ID: {} and card ID: {} is not an issue operation. Cannot return.", bookId, cardId);
             throw new IllegalArgumentException("Book with ID " + bookId + " has already been returned. Cannot return again.");
         }

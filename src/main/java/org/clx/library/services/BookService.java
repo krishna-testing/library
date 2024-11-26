@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Pageable;
@@ -89,16 +88,13 @@ public class BookService {
 
 
     public BookResponse findAllBook(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
-//		Sort sort =null;
+
         Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        /*
-         * if(sortDir.equalsIgnoreCase("asc")) { sort = Sort.by(sortBy).ascending();
-         * }else { sort = Sort.by(sortBy).descending(); }
-         */
+
         Pageable p = PageRequest.of(pageNumber, pageSize, sort /* Sort.by(sortBy).descending() */);
         Page<Book> pagePost = this.bookRepository.findAll(p);
         List<Book> allPosts = pagePost.getContent();
-        List<BookDto> postDtos = allPosts.stream().map((post) -> this.modelMapper.map(post, BookDto.class))
+        List<BookDto> postDtos = allPosts.stream().map(post -> this.modelMapper.map(post, BookDto.class))
                 .toList();
         BookResponse bookResponse = new BookResponse();
         bookResponse.setContent(postDtos);
