@@ -33,7 +33,7 @@ public class BookController {
         try {
             BookDto createdBook = this.bookService.createBook(bookDto, authorId);
             log.info("Book created successfully with ID: {}", createdBook.getId());
-            ApiResponse response = new ApiResponse(HttpStatus.CREATED, "Book created successfully", createdBook);
+            ApiResponse response = new ApiResponse(HttpStatus.CREATED, "Book created successfully", null);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             log.error("Failed to create book with authorId: {}, BookDto: {}. Error: {}", authorId, bookDto, e.getMessage());

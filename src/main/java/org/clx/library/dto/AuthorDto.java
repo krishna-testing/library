@@ -20,6 +20,9 @@ public class AuthorDto {
     private String country;
     private List<BookDto> booksWritten;
 
+    public AuthorDto(int i, String johnDoe, String mail, String usa) {
+    }
+
     // Map Author entity to AuthorDto
     public AuthorDto mapToDto(Author author) {
         AuthorDto authorDto = new AuthorDto();
