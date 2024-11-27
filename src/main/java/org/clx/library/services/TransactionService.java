@@ -102,7 +102,7 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findByCard_Book(cardId, bookId, TransactionStatus.SUCCESSFUL, true);
 
         // Check if no valid issue transactions exist
-        if (transactions == null || transactions.isEmpty()) {
+        if (transactions.isEmpty()) {
             log.error("No active issue transaction found for book ID: {} and card ID: {}. Cannot proceed with return.", bookId, cardId);
             throw new IllegalArgumentException("Book with ID " + bookId + " was not issued to card ID " + cardId + ". Cannot return.");
         }
@@ -127,23 +127,23 @@ public class TransactionService {
         }
 
         // Update the book's availability
-        book.setCard(null);
-        book.setAvailable(true);
-        bookRepository.save(book);
+        book.setCard(null);  // Remove the association with the card
+        book.setAvailable(true);  // Mark as available for the next borrower
+        bookRepository.save(book);  // Save the book update
         log.info("Book with ID: {} has been successfully returned and updated.", bookId);
 
-        // Create a new return transaction
+        // Create and save a new return transaction
         Transaction newTransaction = new Transaction();
         newTransaction.setBook(book);
         newTransaction.setCard(card);
         newTransaction.setFineAmount(fine);
-        newTransaction.setIsIssueOperation(false);
+        newTransaction.setIsIssueOperation(false);  // Mark it as a return operation
         newTransaction.setTransactionStatus(TransactionStatus.SUCCESSFUL);
-        newTransaction.setTransactionDate(new Date());
-        transactionRepository.save(newTransaction);
+        newTransaction.setTransactionDate(new Date());  // Set current date for the transaction
+        transactionRepository.save(newTransaction);  // Save the return transaction
 
         log.info("Return transaction successful. Transaction ID: {}", newTransaction.getTransactionId());
-        return newTransaction.getTransactionId();
+        return newTransaction.getTransactionId();  // Return the transaction ID
     }
 
 
