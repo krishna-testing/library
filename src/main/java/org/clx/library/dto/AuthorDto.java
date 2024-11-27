@@ -28,6 +28,8 @@ public class AuthorDto {
         authorDto.setEmail(author.getEmail());
         authorDto.setAge(author.getAge());
         authorDto.setCountry(author.getCountry());
+        List<BookDto> list = author.getBooksWritten().stream().map(BookDto::bookToBookDto).toList();
+        authorDto.setBooksWritten(list);
         return authorDto;
     }
 

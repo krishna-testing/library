@@ -42,7 +42,7 @@ public class AuthorService {
         }
     }
 
-    public AuthorDto updateAuthor(AuthorDto authorDto, Integer authorId) throws ResourceNotFoundException {
+    public AuthorRequest updateAuthor(AuthorRequest authorRequest, Integer authorId) throws ResourceNotFoundException {
         logger.info("Received request to update author with ID: {}", authorId);
         Optional<Author> existingAuthor = authorRepository.findById(authorId);
         if (existingAuthor.isEmpty()) {
@@ -53,20 +53,25 @@ public class AuthorService {
         Author authorToUpdate = existingAuthor.get();
 
         // Update fields from DTO if not null
-        if (authorDto.getName() != null) {
-            authorToUpdate.setName(authorDto.getName());
-            logger.info("Author name updated to: {}", authorDto.getName());
+        if (authorRequest.getName() != null) {
+            authorToUpdate.setName(authorRequest.getName());
+            logger.info("Author name updated to: {}", authorRequest.getName());
         }
-        if (authorDto.getEmail() != null) {
-            authorToUpdate.setEmail(authorDto.getEmail());
-            logger.info("Author email updated to: {}", authorDto.getEmail());
+        if (authorRequest.getEmail() != null) {
+            authorToUpdate.setEmail(authorRequest.getEmail());
+            logger.info("Author email updated to: {}", authorRequest.getEmail());
         }
+        if (authorRequest.getCountry() != null) {
+            authorToUpdate.setCountry(authorRequest.getCountry());
+            logger.info("Author country updated to: {}", authorRequest.getCountry());
+        }
+
 
         Author updatedAuthor = authorRepository.save(authorToUpdate);
         logger.info("Author with ID: {} updated successfully", authorId);
 
         // Return updated AuthorDto
-        return authorDto.mapToDto(updatedAuthor);
+        return authorRequest.authorToAuthorRequest(updatedAuthor);
     }
 
     public AuthorDto updateAuthor(AuthorDto authorDto) {

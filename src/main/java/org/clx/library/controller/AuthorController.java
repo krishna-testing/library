@@ -39,10 +39,10 @@ public class AuthorController {
         }
     }
     @PutMapping("/updateAuthor/{authorId}")
-    public ResponseEntity<ApiResponse> updateAuthor(@RequestBody AuthorDto authorDto, @PathVariable Integer authorId) {
+    public ResponseEntity<ApiResponse> updateAuthor(@RequestBody AuthorRequest authorRequest, @PathVariable Integer authorId) {
         logger.info("Received request to update author with ID: {}", authorId);
         try {
-            AuthorDto updatedAuthor = authorService.updateAuthor(authorDto, authorId);
+            AuthorRequest updatedAuthor = authorService.updateAuthor(authorRequest, authorId);
             logger.info("Author with ID: {} updated successfully", authorId);
 
             ApiResponse response = new ApiResponse(HttpStatus.ACCEPTED,"Author updated successfully", updatedAuthor);

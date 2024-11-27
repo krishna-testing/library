@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clx.library.dto.AuthorDto;
 import org.clx.library.dto.BookDto;
-import org.clx.library.dto.BookResponse;
+import org.clx.library.payload.BookResponse;
 
 import org.clx.library.exception.ResourceNotFoundException;
 import org.clx.library.exception.UnauthorizedBookDeletionException;
