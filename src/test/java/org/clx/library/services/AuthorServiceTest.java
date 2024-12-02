@@ -104,7 +104,10 @@ import static org.mockito.Mockito.*;
         verify(authorRepository, times(1)).save(any(Author.class));
     }
 
-    @Test
+
+
+
+     @Test
      void testUpdateAuthor_NotFound() {
         // Arrange
         AuthorRequest updatedRequest = new AuthorRequest();
@@ -120,18 +123,50 @@ import static org.mockito.Mockito.*;
         // Assert the exception message matches the actual one
         assertEquals("Author not found with id : 1", thrown.getMessage());
     }
-    @Test
-     void testDeleteAuthor() {
-        // Arrange: Mock the repository method deleteCustom() to return an Integer, e.g., 1
-        doReturn(1).when(authorRepository).deleteCustom(anyInt());
+     @Test
+     void testDeleteAuthor_Failure_ThrowException() {
+         // Arrange: Mock the repository methods
+         int authorId = 1;
+         Author author = new Author(authorId, "John Doe", "john.doe@example.com", 40, "USA", null, null);
 
-        // Act: Call deleteAuthor method
-        authorService.deleteAuthor(1);
+         // Mock findById to return the author
+         when(authorRepository.findById(authorId)).thenReturn(Optional.of(author));
 
-        // Assert: Verify the method was called once
-        verify(authorRepository, times(1)).deleteCustom(1);
-    }
+         // Simulate an exception being thrown by deleteCustom
+         doThrow(new ResourceNotFoundException("author","id",authorId)).when(authorRepository).deleteCustom(authorId);
 
+         // Act & Assert: Ensure the deleteAuthor method throws the exception
+         assertThrows(RuntimeException.class, () -> authorService.deleteAuthor(authorId));
+
+         // Verify that findById was called once with the correct ID
+         verify(authorRepository, times(1)).findById(authorId);
+
+         // Verify that deleteCustom was called once with the correct ID
+         verify(authorRepository, times(1)).deleteCustom(authorId);
+     }
+
+
+     @Test
+     void testDeleteAuthor_ResourceNotFound() {
+         // Arrange: Mock the repository method findById to return an empty Optional
+         int authorId = 1;
+         when(authorRepository.findById(authorId)).thenReturn(Optional.empty());  // Simulate author not found
+
+         // Act & Assert: Expect ResourceNotFoundException to be thrown
+         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
+             authorService.deleteAuthor(authorId);
+         });
+
+         // Assert that the exception message is as expected
+         assertEquals("author not found with id : 1", exception.getMessage());
+
+         // Verify that findById was called once
+         verify(authorRepository, times(1)).findById(authorId);
+
+         // Verify that deleteCustom was never called since the author was not found
+         verify(authorRepository, times(0)).deleteCustom(authorId);
+
+     }
 
 
     @Test

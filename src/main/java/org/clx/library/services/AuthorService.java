@@ -89,11 +89,8 @@ public class AuthorService {
 
     public void deleteAuthor(int id) {
         logger.info("Received request to delete author with ID: {}", id);
-        try {
-            authorRepository.deleteCustom(id);
-            logger.info("Author with ID: {} deleted successfully", id);
-        } catch (Exception e) {
-            logger.error("Error occurred while deleting author with ID: {}: {}", id, e.getMessage(), e);
-        }
+        Author author = authorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("author", "id", id));
+                    authorRepository.deleteCustom(id);
+            logger.info("Author with ID: {} deleted successfully", author.getId());
     }
 }
