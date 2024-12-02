@@ -19,6 +19,7 @@ public class AuthorService {
 
     private final AuthorRepository authorRepository;
 
+
     public AuthorRequest createAuthor(AuthorRequest authorRequest) {
 
         Author author = authorRequest.authorRequestToAuthor();
@@ -30,15 +31,9 @@ public class AuthorService {
 
     public AuthorDto findAuthorById(Integer authorId) throws ResourceNotFoundException {
         logger.info("Received request to find author with ID: {}", authorId);
-        Optional<Author> author = authorRepository.findById(authorId);
-        if (author.isPresent()) {
-            logger.info("Author with ID: {} found", authorId);
-            AuthorDto authorDto = new AuthorDto();
-            return authorDto.mapToDto(author.get());
-        } else {
-            logger.error("Author with ID: {} not found", authorId);
-            throw new ResourceNotFoundException("Author","id",authorId);
-        }
+        Author author = authorRepository.findById(authorId).orElseThrow(() -> new ResourceNotFoundException("author", "id", authorId));
+        AuthorDto authorDto = new AuthorDto();
+        return authorDto.mapToDto(author);
     }
 
     public AuthorRequest updateAuthor(AuthorRequest authorRequest, Integer authorId) throws ResourceNotFoundException {
@@ -46,7 +41,7 @@ public class AuthorService {
         Optional<Author> existingAuthor = authorRepository.findById(authorId);
         if (existingAuthor.isEmpty()) {
             logger.error("Author with ID: {} not found. Cannot update.", authorId);
-            throw new ResourceNotFoundException("Author","id",authorId);
+            throw new ResourceNotFoundException("Author", "id", authorId);
         }
 
         Author authorToUpdate = existingAuthor.get();
@@ -65,9 +60,11 @@ public class AuthorService {
             logger.info("Author country updated to: {}", authorRequest.getCountry());
         }
 
+
         Author updatedAuthor = authorRepository.save(authorToUpdate);
         logger.info("Author with ID: {} updated successfully", authorId);
 
+        // Return updated AuthorDto
         return authorRequest.authorToAuthorRequest(updatedAuthor);
     }
 
@@ -87,7 +84,10 @@ public class AuthorService {
     public void deleteAuthor(int id) {
         logger.info("Received request to delete author with ID: {}", id);
         Author author = authorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("author", "id", id));
-                    authorRepository.deleteCustom(id);
-            logger.info("Author with ID: {} deleted successfully", author.getId());
+        authorRepository.deleteById(id);
+        logger.info("Author with ID: {} deleted successfully", author.getId());
     }
+
 }
+
+

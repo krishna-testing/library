@@ -78,7 +78,7 @@ import static org.mockito.Mockito.*;
         });
 
         // Assert the exception message matches the actual one
-        assertEquals("Author not found with id : 1", thrown.getMessage());
+        assertEquals("author not found with id : 1", thrown.getMessage());
     }
 
     @Test
@@ -133,7 +133,7 @@ import static org.mockito.Mockito.*;
          when(authorRepository.findById(authorId)).thenReturn(Optional.of(author));
 
          // Simulate an exception being thrown by deleteCustom
-         doThrow(new ResourceNotFoundException("author","id",authorId)).when(authorRepository).deleteCustom(authorId);
+         doThrow(new ResourceNotFoundException("author","id",authorId)).when(authorRepository).deleteById(authorId);
 
          // Act & Assert: Ensure the deleteAuthor method throws the exception
          assertThrows(RuntimeException.class, () -> authorService.deleteAuthor(authorId));
@@ -142,7 +142,7 @@ import static org.mockito.Mockito.*;
          verify(authorRepository, times(1)).findById(authorId);
 
          // Verify that deleteCustom was called once with the correct ID
-         verify(authorRepository, times(1)).deleteCustom(authorId);
+         verify(authorRepository, times(1)).deleteById(authorId);
      }
 
 
@@ -164,7 +164,7 @@ import static org.mockito.Mockito.*;
          verify(authorRepository, times(1)).findById(authorId);
 
          // Verify that deleteCustom was never called since the author was not found
-         verify(authorRepository, times(0)).deleteCustom(authorId);
+         verify(authorRepository, times(0)).deleteById(authorId);
 
      }
 
@@ -186,4 +186,23 @@ import static org.mockito.Mockito.*;
         // Assert: Verify that `updateAuthorDetails` was called exactly once
         verify(authorRepository, times(1)).updateAuthorDetails(any(Author.class));
     }
+
+     @Test
+     void testFindAuthorById_Success() throws ResourceNotFoundException {
+         // Arrange: Mock the repository to return an Optional containing the author
+         when(authorRepository.findById(1)).thenReturn(Optional.of(author));
+
+         // Act: Call the findAuthorById method
+         AuthorDto result = authorService.findAuthorById(1);
+
+         // Assert: Verify that the result is not null and matches the expected AuthorDto
+         assertNotNull(result);
+         assertEquals(1, result.getId());
+         assertEquals("John Doe", result.getName());
+         assertEquals("john.doe@example.com", result.getEmail());
+         assertEquals("USA", result.getCountry());
+
+         // Verify that the repository method was called once
+         verify(authorRepository, times(1)).findById(1);
+     }
 }
