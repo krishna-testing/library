@@ -26,7 +26,7 @@ class TransactionControllerTest {
     @MockBean
     private TransactionService transactionService;
 
-    private static final String ISSUE_BOOK_URL = "/issueBook";
+    private static final String ISSUE_BOOK_URL = "/api/transaction/issueBook";
 
     @BeforeEach
     void setUp() {
@@ -88,7 +88,7 @@ class TransactionControllerTest {
         when(transactionService.returnBooks(cardId, bookId)).thenReturn(transactionId);
 
         // Act & Assert
-        mockMvc.perform(post("/returnBook")
+        mockMvc.perform(post("/api/transaction/returnBook")
                         .param("cardId", String.valueOf(cardId))
                         .param("bookId", String.valueOf(bookId))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -110,7 +110,7 @@ class TransactionControllerTest {
                 .when(transactionService).returnBooks(cardId, bookId);
 
         // Act & Assert
-        mockMvc.perform(post("/returnBook")
+        mockMvc.perform(post("/api/transaction/returnBook")
                         .param("cardId", String.valueOf(cardId))
                         .param("bookId", String.valueOf(bookId))
                         .contentType(MediaType.APPLICATION_JSON))

@@ -30,13 +30,13 @@ class StudentControllerTest {
     private ObjectMapper objectMapper;
 
 
-    private static final String CREATE_STUDENT_URL = "/createStudent";
+    private static final String CREATE_STUDENT_URL = "/api/student/createStudent";
 
-    private static final String UPDATE_STUDENT_URL = "/updateStudent/{studentId}";
+    private static final String UPDATE_STUDENT_URL = "/api/student/updateStudent/{studentId}";
 
-    private static final String DELETE_STUDENT_URL = "/deleteStudent/{id}";
+    private static final String DELETE_STUDENT_URL = "/api/student/deleteStudent/{id}";
 
-    private static final String GET_STUDENT_URL = "/getStudentById/{id}";
+    private static final String GET_STUDENT_URL = "/api/student/getStudentById/{id}";
 
     @Test
     void testCreateStudent_ValidRequest() throws Exception {

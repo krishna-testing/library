@@ -2,17 +2,18 @@ package org.clx.library.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.clx.library.exception.ResourceNotFoundException;
 import org.clx.library.payload.ApiResponse;
 import org.clx.library.services.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
+@RequestMapping("/api/transaction")
 @RequiredArgsConstructor
 public class TransactionController {
 
