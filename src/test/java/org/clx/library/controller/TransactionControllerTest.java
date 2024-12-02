@@ -1,9 +1,6 @@
 package org.clx.library.controller;
 
 import org.clx.library.exception.ResourceNotFoundException;
-import org.clx.library.repositories.BookRepository;
-import org.clx.library.repositories.CardRepository;
-import org.clx.library.repositories.TransactionRepository;
 import org.clx.library.services.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

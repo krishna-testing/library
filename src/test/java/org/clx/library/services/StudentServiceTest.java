@@ -5,7 +5,6 @@ import org.clx.library.dto.StudentRequest;
 import org.clx.library.exception.ResourceNotFoundException;
 import org.clx.library.model.Card;
 import org.clx.library.model.Student;
-import org.clx.library.repositories.CardRepository;
 import org.clx.library.repositories.StudentRepository;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
