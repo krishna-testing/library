@@ -54,11 +54,6 @@ public class AuthorController {
             ApiResponse response = new ApiResponse(HttpStatus.NOT_FOUND,"Author not found", e.getMessage()
             );
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            logger.error("Error updating author with ID: {}: {}", authorId, e.getMessage());
-
-            ApiResponse response = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR,MESSAGE,e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -96,12 +91,6 @@ public class AuthorController {
             // Create a not-found response
             ApiResponse response = new ApiResponse(HttpStatus.NOT_FOUND,MESSAGE, e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            logger.error("Error finding author with ID: {}: {}", authorId, e.getMessage());
-
-            // Create an internal server error response
-            ApiResponse response = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR,MESSAGE, e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

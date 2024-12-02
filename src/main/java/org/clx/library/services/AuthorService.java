@@ -19,7 +19,6 @@ public class AuthorService {
 
     private final AuthorRepository authorRepository;
 
-
     public AuthorRequest createAuthor(AuthorRequest authorRequest) {
 
         Author author = authorRequest.authorRequestToAuthor();
@@ -66,11 +65,9 @@ public class AuthorService {
             logger.info("Author country updated to: {}", authorRequest.getCountry());
         }
 
-
         Author updatedAuthor = authorRepository.save(authorToUpdate);
         logger.info("Author with ID: {} updated successfully", authorId);
 
-        // Return updated AuthorDto
         return authorRequest.authorToAuthorRequest(updatedAuthor);
     }
 

@@ -121,7 +121,6 @@ public class BookService {
         }
         log.info("Fetching books based on availability: {}", isAvailable);
         return bookRepository.findBooksByAvailability(isAvailable);
-
     }
 
 }

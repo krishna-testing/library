@@ -92,10 +92,6 @@ public class BookController {
             log.error("Book with ID: {} not found. Error: {}", bookId, e.getMessage());
             ApiResponse response = new ApiResponse(HttpStatus.NOT_FOUND, "Book not found", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            log.error("Unexpected error occurred while fetching book with ID: {}. Error: {}", bookId, e.getMessage());
-            ApiResponse response = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR, MESSAGE, e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -111,13 +107,6 @@ public class BookController {
             log.error("Book with ID: {} not found. Error: {}", bookId, e.getMessage());
             ApiResponse response = new ApiResponse(HttpStatus.NOT_FOUND, "Book not found", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            log.error("Failed to update book with ID: {}. Error: {}", bookId, e.getMessage());
-
-            // Build error response
-            ApiResponse response = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR, MESSAGE, e.getMessage()
-            );
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
