@@ -70,15 +70,11 @@ public class AuthorService {
 
     public AuthorDto updateAuthor(AuthorDto authorDto) {
         logger.info("Request is now received to update author: {}", authorDto);
-        try {
-            Author author = AuthorDto.mapToEntity(authorDto);
+        Author author = AuthorDto.mapToEntity(authorDto);
             authorRepository.updateAuthorDetails(author);
             logger.info("Author details updated successfully for author: {}", authorDto);
             return authorDto; // Assuming the input DTO is sufficient
-        } catch (Exception e) {
-            logger.error("Error occurred while updating author details: {}", e.getMessage(), e);
-            return null;
-        }
+
     }
 
     public void deleteAuthor(int id) {
