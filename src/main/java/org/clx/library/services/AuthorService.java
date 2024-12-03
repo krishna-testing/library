@@ -9,6 +9,7 @@ import org.clx.library.repositories.AuthorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Optional;
 
@@ -19,6 +20,7 @@ public class AuthorService {
 
     private final AuthorRepository authorRepository;
 
+    WebClient webClient = WebClient.builder().baseUrl("http://192.168.10.186:8081/").build();
 
     public AuthorRequest createAuthor(AuthorRequest authorRequest) {
 
@@ -30,10 +32,11 @@ public class AuthorService {
     }
 
     public AuthorDto findAuthorById(Integer authorId) throws ResourceNotFoundException {
-        logger.info("Received request to find author with ID: {}", authorId);
-        Author author = authorRepository.findById(authorId).orElseThrow(() -> new ResourceNotFoundException("author", "id", authorId));
-        AuthorDto authorDto = new AuthorDto();
-        return authorDto.mapToDto(author);
+        return webClient.get()
+                .uri("findAuthor/{authorId}",authorId)
+                .retrieve()
+                .bodyToMono(AuthorDto.class)
+                .block();
     }
 
     public AuthorRequest updateAuthor(AuthorRequest authorRequest, Integer authorId) throws ResourceNotFoundException {
