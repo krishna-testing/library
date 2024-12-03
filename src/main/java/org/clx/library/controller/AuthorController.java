@@ -33,21 +33,6 @@ public class AuthorController {
     }
 
 
-//    @PostMapping("/createStudent")
-//    public ResponseEntity<ApiResponse> createStudent(@Valid @RequestBody StudentRequest studentRequest){
-//        if (studentRequest.getAge()==null){
-//            ApiResponse response = new ApiResponse(HttpStatus.NOT_ACCEPTABLE, MESSAGE, "please enter age");
-//            return new ResponseEntity<>(response,HttpStatus.NOT_ACCEPTABLE);
-//        }
-//        try {
-//            studentService.createStudent(studentRequest);
-//            log.info("student created successfully");
-//            ApiResponse response = new ApiResponse(HttpStatus.CREATED, "Student Successfully added to the system", null);
-//            return new ResponseEntity<>(response, HttpStatus.CREATED);
-//        }catch (Exception e){
-//            ApiResponse response = new ApiResponse(HttpStatus.NOT_ACCEPTABLE, MESSAGE, e.getMessage());
-//            return new ResponseEntity<>(response,HttpStatus.NOT_ACCEPTABLE);
-//        }
     @PutMapping("/updateAuthor/{authorId}")
     public ResponseEntity<ApiResponse> updateAuthor(@RequestBody AuthorRequest authorRequest, @PathVariable Integer authorId) {
         logger.info("Received request to update author with ID: {}", authorId);

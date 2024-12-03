@@ -68,14 +68,7 @@ public class AuthorService {
         return authorRequest.authorToAuthorRequest(updatedAuthor);
     }
 
-    public AuthorDto updateAuthor(AuthorDto authorDto) {
-        logger.info("Request is now received to update author: {}", authorDto);
-        Author author = AuthorDto.mapToEntity(authorDto);
-            authorRepository.updateAuthorDetails(author);
-            logger.info("Author details updated successfully for author: {}", authorDto);
-            return authorDto; // Assuming the input DTO is sufficient
 
-    }
 
     public void deleteAuthor(int id) {
         logger.info("Received request to delete author with ID: {}", id);

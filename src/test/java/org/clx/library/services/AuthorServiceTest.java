@@ -127,10 +127,10 @@ import static org.mockito.Mockito.*;
      void testDeleteAuthor_Failure_ThrowException() {
          // Arrange: Mock the repository methods
          int authorId = 1;
-         Author author = new Author(authorId, "John Doe", "john.doe@example.com", 40, "USA", null, null);
+         Author authors = new Author(authorId, "John Doe", "john.doe@example.com", 40, "USA", null, null);
 
          // Mock findById to return the author
-         when(authorRepository.findById(authorId)).thenReturn(Optional.of(author));
+         when(authorRepository.findById(authorId)).thenReturn(Optional.of(authors));
 
          // Simulate an exception being thrown by deleteCustom
          doThrow(new ResourceNotFoundException("author","id",authorId)).when(authorRepository).deleteById(authorId);
@@ -167,25 +167,6 @@ import static org.mockito.Mockito.*;
          verify(authorRepository, times(0)).deleteById(authorId);
 
      }
-
-
-    @Test
-     void testUpdateAuthorDto() {
-        when(authorRepository.updateAuthorDetails(any(Author.class))).thenReturn(1);
-
-        // Act: Call updateAuthor
-        AuthorDto result = authorService.updateAuthor(authorDto);
-
-        // Assert: Verify the result is not null and the expected values are mapped correctly
-        assertNotNull(result);
-        assertEquals(1, result.getId());
-        assertEquals("John Doe", result.getName());
-        assertEquals("john.doe@example.com", result.getEmail());
-        assertEquals("USA", result.getCountry());
-
-        // Assert: Verify that `updateAuthorDetails` was called exactly once
-        verify(authorRepository, times(1)).updateAuthorDetails(any(Author.class));
-    }
 
      @Test
      void testFindAuthorById_Success() throws ResourceNotFoundException {

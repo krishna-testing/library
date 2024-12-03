@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.clx.library.model.Book;
 import org.clx.library.model.Transaction;
 import org.clx.library.model.TransactionStatus;
 

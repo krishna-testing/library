@@ -1,17 +1,14 @@
 package org.clx.library.controller;
 
-import static com.mysql.cj.conf.PropertyKey.logger;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import org.clx.library.dto.AuthorDto;
 import org.clx.library.dto.AuthorRequest;
 import org.clx.library.exception.ResourceNotFoundException;
 
-import org.clx.library.payload.ApiResponse;
 import org.clx.library.services.AuthorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +34,6 @@ class AuthorControllerTest {
 
     private AuthorRequest authorRequest;
     private AuthorDto authorDto;
-    private AuthorController authorController;
 
     @BeforeEach
     void setUp() {
