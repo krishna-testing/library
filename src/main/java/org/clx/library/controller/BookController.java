@@ -1,5 +1,6 @@
 package org.clx.library.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.clx.library.dto.BookDto;
 import org.clx.library.exception.ResourceNotFoundException;
@@ -96,18 +97,12 @@ public class BookController {
     }
 
     @PutMapping("/book/{bookId}")
-    public ResponseEntity<ApiResponse> updateBook(@RequestBody BookDto bookDto, @PathVariable Integer bookId) {
+    public ResponseEntity<ApiResponse> updateBook(@Valid @RequestBody BookDto bookDto, @PathVariable Integer bookId) {
         log.info("Received request to update book with ID: {}. Updated BookDto: {}", bookId, bookDto);
-        try {
-            BookDto updatedBook = this.bookService.updateBook(bookDto, bookId);
-            log.info("Book with ID: {} updated successfully", bookId);
-            ApiResponse response = new ApiResponse(HttpStatus.OK, "Book updated successfully", updatedBook);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (ResourceNotFoundException e) {
-            log.error("Book with ID: {} not found. Error: {}", bookId, e.getMessage());
-            ApiResponse response = new ApiResponse(HttpStatus.NOT_FOUND, "Book not found", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
+        BookDto updatedBook = this.bookService.updateBook(bookDto, bookId);
+        log.info("Book with ID: {} updated successfully", bookId);
+        ApiResponse response = new ApiResponse(HttpStatus.OK, "Book updated successfully", updatedBook);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

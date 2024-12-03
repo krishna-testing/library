@@ -14,27 +14,27 @@ import java.util.List;
 @NoArgsConstructor
 public class BookDto {
 
-    private int id;
-    private String name;
-    private Genre genre;
+        private int id;
+        private String name;
+        private Genre genre;
 
-    private boolean available;
+        private boolean available;
 
-    @JsonIgnore
-    private List<TransactionDto> transactions;
+        @JsonIgnore
+        private List<TransactionDto> transactions;
 
-    public Book bookDtoToBook() {
-        Book book = new Book();
-        book.setId(id);
-        book.setName(name);
-        book.setGenre(genre);
-        book.setAvailable(available);
-//        List<Transaction> transactionList = transactions.stream()
-//                .map(TransactionDto::transactionDtoToTransaction)
-//                .toList();
-//        book.setTransactions(transactionList);
-        return book;
-    }
+        public Book bookDtoToBook() {
+            Book book = new Book();
+            book.setId(id);
+            book.setName(name);
+            book.setGenre(genre);
+            book.setAvailable(available);
+    //        List<Transaction> transactionList = transactions.stream()
+    //                .map(TransactionDto::transactionDtoToTransaction)
+    //                .toList();
+    //        book.setTransactions(transactionList);
+            return book;
+        }
 
     public static BookDto bookToBookDto(Book book) {
         BookDto bookDto = new BookDto();

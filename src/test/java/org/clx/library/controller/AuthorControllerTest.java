@@ -1,15 +1,22 @@
 package org.clx.library.controller;
 
+import static com.mysql.cj.conf.PropertyKey.logger;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.clx.library.dto.AuthorDto;
 import org.clx.library.dto.AuthorRequest;
 import org.clx.library.exception.ResourceNotFoundException;
 
+import org.clx.library.payload.ApiResponse;
 import org.clx.library.services.AuthorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -23,12 +30,14 @@ class AuthorControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
+    @Mock
+    private Logger logger;
     @MockBean
     private AuthorService authorService; // Mock the AuthorService
 
     private AuthorRequest authorRequest;
     private AuthorDto authorDto;
+    private AuthorController authorController;
 
     @BeforeEach
     void setUp() {
@@ -93,16 +102,6 @@ class AuthorControllerTest {
         verify(authorService, times(1)).updateAuthor(any(AuthorRequest.class), eq(999));
     }
 
-//    @Test
-//    void testDeleteAuthor_Success() throws Exception {
-//        doNothing().when(authorService).deleteAuthor(anyInt());
-//
-//        mockMvc.perform(MockMvcRequestBuilders.delete("/deleteAuthor/{id}", 1))
-//                .andExpect(status().isNoContent())
-//                .andExpect(jsonPath("$.message").value("Author successfully deleted!!"));
-//
-//        verify(authorService, times(1)).deleteAuthor((1));
-//    }
 
     @Test
     void testDeleteAuthor_Error() throws Exception {
@@ -116,6 +115,23 @@ class AuthorControllerTest {
 
         verify(authorService, times(1)).deleteAuthor((1));
     }
+
+    @Test
+    void testDeleteAuthor_Success() throws Exception {
+        int authorId = 1;
+
+        // Mock the service
+        doNothing().when(authorService).deleteAuthor(authorId);
+
+        // Perform the request
+        mockMvc.perform(delete("/deleteAuthor/{id}", authorId))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        // Verify the service method was called
+        verify(authorService, times(1)).deleteAuthor(authorId);
+    }
+
 
     @Test
     void testFindAuthorById_Success() throws Exception {
