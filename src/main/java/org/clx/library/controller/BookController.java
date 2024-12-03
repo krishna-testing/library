@@ -67,7 +67,7 @@ public class BookController {
         log.info("Received request to get books with parameters - Genre: {}, Available: {}, Author: {}", genre, isAvailable, author);
 
         try {
-            List<Book> books = bookService.getBooks(genre, isAvailable, author);
+            List<BookDto> books = bookService.getBooks(genre, isAvailable, author);
             log.info("Returning {} books", books.size());
             ApiResponse response = new ApiResponse(HttpStatus.OK, "Books retrieved successfully", books);
             return new ResponseEntity<>(response, HttpStatus.OK);
