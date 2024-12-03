@@ -5,52 +5,62 @@ import lombok.extern.slf4j.Slf4j;
 import org.clx.library.dto.StudentDto;
 import org.clx.library.dto.StudentRequest;
 import org.clx.library.exception.ResourceNotFoundException;
-import org.clx.library.model.Card;
-import org.clx.library.model.Student;
-import org.clx.library.repositories.StudentRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class StudentService {
-    private final StudentRepository studentRepository;
 
-    private final CardService cardService;
+    private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
-    private static final String STUDENTNAME ="student";
+    private final WebClient webClient;
 
-    public void createStudent(StudentRequest studentRequest) {
-        Student student = studentRequest.studentRequestToStudent();
-        studentRepository.save(student);
-        Card card = cardService.createCard(student);
-        log.info("Card created for student with ID: {} and card ID: {}", student.getId(), card.getId());
+
+
+    public StudentRequest createStudent(StudentRequest studentRequest) {
+        logger.info("sending request to create student");
+        return webClient.post()
+                .uri("/api/student/createStudent")
+                .body(Mono.just(studentRequest), StudentRequest.class)
+                .retrieve()
+                .bodyToMono(StudentRequest.class)
+                .doOnSuccess(response -> logger.info("Student created successfully"))
+                .block();
+
+    }
+    public StudentRequest updateStudent(StudentRequest studentRequest, Integer authorId) throws ResourceNotFoundException {
+        logger.info("Sending request to update author with ID: {}", authorId);
+        return webClient.put()
+                .uri("/api/student/updateStudent/{studentId}", authorId)
+                .body(Mono.just(studentRequest), StudentRequest.class)
+                .retrieve()
+                .bodyToMono(StudentRequest.class)
+                .doOnSuccess(response -> logger.info("Student updated successfully: {}", response.getName()))
+                .block();
     }
 
-    public void updateStudent(StudentRequest studentRequest,int studentId) {
-        Student student1 = studentRepository.findById(studentId).orElseThrow(() -> new ResourceNotFoundException(STUDENTNAME, "id", studentId));
-        Student student = studentRequest.studentRequestToStudent();
-        student.setId(studentId);
-        studentRepository.updateStudentDetails(student,studentId);
-        log.info("Successfully updated student with ID: {}", student1.getId());
+    public void deleteStudent(int studentId) {
+        logger.info("Sending request to delete student with ID: {}", studentId);
+        webClient.delete()
+                .uri("/api/student/deleteStudent/{id}", studentId)
+                .retrieve()
+                .toBodilessEntity()
+                .doOnSuccess(response -> logger.info("Student deleted successfully"))
+                .block();
     }
 
-    public void deleteStudent(int id) {
-        Student student = studentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(STUDENTNAME, "id", id));
-        cardService.deactivate(student.getCard().getId());
-        log.info("Card successfully deactivated for student ID: {}", id);
-        studentRepository.deleteCustom(id);
-        log.info("Successfully deleted student with ID: {}", id);
-    }
-
-    public StudentDto getStudentById(int studentId) {
-        log.info("Fetching student with ID: {}", studentId);
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> {
-                    log.warn("Student with ID: {} not found", studentId);
-                    return new ResourceNotFoundException(STUDENTNAME, "id", studentId);
-                });
-        StudentDto studentDto = new StudentDto();
-        return studentDto.studentToStudentDto(student);
+    public StudentDto getStudentById(Integer studentId) throws ResourceNotFoundException {
+        logger.info("Fetching student with ID: {}", studentId);
+        return webClient.get()
+                .uri("/api/student/getStudentById/{id}", studentId)
+                .retrieve()
+                .bodyToMono(StudentDto.class)
+                .doOnError(e -> logger.error("Error fetching student: {}", e.getMessage()))
+                .block();
     }
 }
