@@ -62,6 +62,7 @@ public class BookService {
         if (book.getAuthor().getId() != author.getId()) {
             throw new UnauthorizedBookDeletionException("You are not authorized to delete this book.");
         }
+
         bookRepository.delete(book);
         log.info("Book deleted successfully with ID: {}", bookId);
         return "Book deleted successfully";
