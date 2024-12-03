@@ -25,14 +25,14 @@ public class AuthorService {
                 .body(Mono.just(authorRequest), AuthorRequest.class)
                 .retrieve()
                 .bodyToMono(AuthorRequest.class)
-                .doOnSuccess(response -> logger.info("Author created with Name: {}", response.getName()))
+                .doOnSuccess(response -> logger.info("Author created successfully"))
                 .block();
     }
 
     public AuthorDto findAuthorById(Integer authorId) throws ResourceNotFoundException {
         logger.info("Fetching author with ID: {}", authorId);
         return webClient.get()
-                .uri("/authors/{authorId}", authorId)
+                .uri("/findAuthor/{authorId}", authorId)
                 .retrieve()
                 .bodyToMono(AuthorDto.class)
                 .doOnError(e -> logger.error("Error fetching author: {}", e.getMessage()))
@@ -42,7 +42,7 @@ public class AuthorService {
     public AuthorRequest updateAuthor(AuthorRequest authorRequest, Integer authorId) throws ResourceNotFoundException {
         logger.info("Sending request to update author with ID: {}", authorId);
         return webClient.put()
-                .uri("/authors/{authorId}", authorId)
+                .uri("/updateAuthor/{authorId}", authorId)
                 .body(Mono.just(authorRequest), AuthorRequest.class)
                 .retrieve()
                 .bodyToMono(AuthorRequest.class)
@@ -53,7 +53,7 @@ public class AuthorService {
     public void deleteAuthor(int authorId) {
         logger.info("Sending request to delete author with ID: {}", authorId);
         webClient.delete()
-                .uri("/authors/{authorId}", authorId)
+                .uri("/deleteAuthor/{id}", authorId)
                 .retrieve()
                 .toBodilessEntity()
                 .doOnSuccess(response -> logger.info("Author deleted successfully"))
