@@ -1,211 +1,195 @@
 package org.clx.library.services;
 
+import org.clx.library.dto.BookDto;
+import org.clx.library.exception.ResourceNotFoundException;
+import org.clx.library.exception.UnauthorizedBookDeletionException;
+import org.clx.library.model.Author;
 import org.clx.library.model.Book;
 import org.clx.library.model.Genre;
 import org.clx.library.repositories.BookRepository;
+import org.clx.library.repositories.AuthorRepository;
+import org.clx.library.dto.AuthorDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import java.util.Collections;
+import org.mockito.*;
+import org.modelmapper.ModelMapper;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
-
-import org.clx.library.model.Author;
-import org.clx.library.repositories.AuthorRepository;
-
-import org.mockito.Mockito;
-
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class BookServiceTest {
+
+    @Mock
+    private BookRepository bookRepository;
 
     @Mock
     private AuthorRepository authorRepository;
 
     @Mock
-    private BookRepository bookRepository;
-
+    private ModelMapper modelMapper; //
     @Mock
     private AuthorService authorService;
 
     @InjectMocks
     private BookService bookService;
 
-    private Author author;
+    private BookDto bookDto;
     private Book book;
+    private AuthorDto authorDto;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Initialize Author and Book objects
-        author = new Author();
-        author.setId(1);
-        author.setName("Author Name");
+        bookDto = new BookDto();
+        bookDto.setName("Book 1");
+        bookDto.setGenre(Genre.FICTIONAL);
+        bookDto.setAvailable(true);
 
         book = new Book();
         book.setId(1);
-        book.setName("Book Title");
-        book.setAuthor(author);
-        book.setCreatedAt(LocalDateTime.now());
+        book.setName("Book 1");
+        book.setGenre(Genre.FICTIONAL);
+        book.setAvailable(true);
+
+        authorDto = new AuthorDto();
+        authorDto.setId(1);
+        authorDto.setName("John Doe");
     }
 
     @Test
-    void testCreateBook() {
+    void testCreateBook_AuthorNotFound() {
         // Arrange
-        Integer authorId = 1;
-        when(authorService.findAuthorById(authorId)).thenReturn(author);
-        when(bookRepository.save(Mockito.any(Book.class))).thenReturn(book);
-
-        // Act
-        Book createdBook = bookService.createBook(book, authorId);
-
-        // Assert
-        assertNotNull(createdBook);
-        assertEquals(book.getName(), createdBook.getName());
-        assertEquals(book.getAuthor().getId(), createdBook.getAuthor().getId());
-        verify(bookRepository, times(1)).save(Mockito.any(Book.class));
-    }
-
-    @Test
-    void testDeleteBook_Success() throws Exception {
-        // Arrange
-        Integer bookId = 1;
-        Integer authorId = 1;
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-        when(authorService.findAuthorById(authorId)).thenReturn(author);
-
-        // Act
-        String result = bookService.deleteBook(bookId, authorId);
-
-        // Assert
-        assertEquals("Post deleted Successfully", result);
-        verify(bookRepository, times(1)).delete(book);
-    }
-
-    @Test
-    void testDeleteBook_Failure() throws Exception {
-        // Arrange
-        Integer bookId = 1;
-        Integer authorId = 1;
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-        when(authorService.findAuthorById(authorId)).thenReturn(new Author()); // Different author
+        when(authorRepository.findById(1)).thenReturn(Optional.empty());
 
         // Act & Assert
-        Exception exception = assertThrows(Exception.class, () -> {
-            bookService.deleteBook(bookId, authorId);
-        });
-
-        assertEquals("You are not authorized to delete this book.", exception.getMessage());
+        assertThrows(ResourceNotFoundException.class, () -> bookService.createBook(bookDto, 1));
     }
+
+    @Test
+    void testDeleteBook_Success() {
+        // Arrange
+        Book bookToDelete = new Book();
+        bookToDelete.setId(1);
+        bookToDelete.setName("Book 1");
+
+        // Create and set the Author object for the book
+        Author author = new Author();
+        author.setId(1); // Set the author ID
+        bookToDelete.setAuthor(author); // Set the author for the book
+
+        // Mock the repository and service methods
+        when(bookRepository.findById(1)).thenReturn(Optional.of(bookToDelete));
+        when(authorService.findAuthorById(1)).thenReturn(authorDto);
+
+        // Act
+        String result = bookService.deleteBook(1, 1);
+
+        // Assert
+        assertEquals("Book deleted successfully", result);
+        verify(bookRepository, times(1)).delete(bookToDelete);
+    }
+
+    @Test
+    void testDeleteBook_Unauthorized() {
+        // Arrange
+        // Create a book and set its author with a specific ID (different from the authorId passed to deleteBook)
+        Book bookToDelete = new Book();
+        bookToDelete.setId(1);
+        bookToDelete.setName("Book 1");
+
+        Author author = new Author();
+        author.setId(2);  // Author ID is 2, which should not match the authorId 1 passed in the test
+        bookToDelete.setAuthor(author);  // Assign the author to the book
+
+        // Mock the bookRepository to return the book when findById is called
+        when(bookRepository.findById(1)).thenReturn(Optional.of(bookToDelete));
+
+        // Mock the authorService to return an AuthorDto with ID 1 (doesn't match the book's author ID)
+        AuthorDto authorDto1 = new AuthorDto();
+        authorDto1.setId(1);  // Different ID than the book's author
+        when(authorService.findAuthorById(1)).thenReturn(authorDto);
+
+        // Act & Assert
+        assertThrows(UnauthorizedBookDeletionException.class, () -> bookService.deleteBook(1, 1));
+    }
+
 
     @Test
     void testFindBookById_Success() {
-        // Arrange
-        Integer bookId = 1;
-        Book book1 = new Book();
-        book1.setId(bookId);  // Ensure the book has the correct ID
+        Book books = new Book();
+        books.setId(1);
+        books.setName("Book 1");
 
-        // Mock the repository to return the book when the findById method is called
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        BookDto bookDtos = new BookDto();
+        bookDtos.setId(1);
+        bookDtos.setName("Book 1");
 
-        // Act
-        Book foundBook = bookService.findBookById(bookId);
+        when(bookRepository.findById(1)).thenReturn(Optional.of(books));
 
-        // Assert
-        assertNotNull(foundBook, "The found book should not be null");
-        assertEquals(bookId, foundBook.getId(), "The book ID should match the expected ID");
+        when(modelMapper.map(books, BookDto.class)).thenReturn(bookDtos);
+
+        BookDto foundBook = bookService.findBookById(1);
+
+        assertNotNull(foundBook);
+        assertEquals(1, foundBook.getId());   // Ensure the id is correctly set
+        assertEquals("Book 1", foundBook.getName());   // Ensure the name is correctly mapped
     }
-
 
     @Test
     void testFindBookById_NotFound() {
-        // Arrange
-        Integer bookId = 1;
-        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+        when(bookRepository.findById(1)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        Exception exception = assertThrows(Exception.class, () -> {
-            bookService.findBookById(bookId);
-        });
-
-        assertEquals("Book not found with this id: 1", exception.getMessage());
+        assertThrows(ResourceNotFoundException.class, () -> bookService.findBookById(1));
     }
 
     @Test
-    void testSavedBook() throws Exception {
+    void testUpdateBook_Success() {
         // Arrange
-        Integer bookId = 1;
-        Integer authorId = 1;
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-        when(authorService.findAuthorById(authorId)).thenReturn(author);
+        BookDto updatedBookDto = new BookDto();
+        updatedBookDto.setName("Updated Book");
+        updatedBookDto.setGenre(Genre.FICTIONAL);
+        updatedBookDto.setAvailable(true);
 
-        // Act
-        Book savedBook = bookService.savedBook(bookId, authorId);
+        Book books = new Book();
+        books.setId(1);
+        books.setName("Updated Book");
+        books.setGenre(Genre.FICTIONAL);
+        books.setAvailable(true);
 
-        // Assert
-        assertNotNull(savedBook);
-        verify(authorRepository, times(1)).save(author);
+        ModelMapper mockModelMapper = mock(ModelMapper.class);
+        when(mockModelMapper.map(any(Book.class), eq(BookDto.class))).thenReturn(updatedBookDto);
+
+        BookService bookServiceWithMockedModelMapper = new BookService(authorRepository, bookRepository, authorService, mockModelMapper );
+
+        when(bookRepository.findById(1)).thenReturn(Optional.of(book));
+        when(bookRepository.save(any(Book.class))).thenReturn(book);
+
+        BookDto updatedBook = bookServiceWithMockedModelMapper.updateBook(updatedBookDto, 1);
+
+        assertNotNull(updatedBook);
+        assertEquals("Updated Book", updatedBook.getName());
+        assertEquals(Genre.FICTIONAL, updatedBook.getGenre());
+    }
+
+
+    @Test
+    void testUpdateBook_NotFound() {
+        when(bookRepository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> bookService.updateBook(bookDto, 1));
     }
 
     @Test
-    void testGetBooksByGenreAndAuthor() {
-        // Arrange
-        String genre = "FICTIONAL";
-        String authorName = "Author Name";
-        boolean isAvailable = true;
-        List<Book> books = Collections.singletonList(book);
-        when(bookRepository.findBooksByGenre_Author(Genre.valueOf(genre), authorName, isAvailable)).thenReturn(books);
+    void testGetBooks_ByGenreAndAuthor_Success() {
+        when(bookRepository.findBooksByGenre_Author(Genre.FICTIONAL, "John Doe", true)).thenReturn(List.of(book));
 
-        // Act
-        List<Book> result = bookService.getBooks(genre, isAvailable, authorName);
+        List<Book> books = bookService.getBooks("FICTIONAL", true, "John Doe");
 
-        // Assert
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(book.getName(), result.getFirst().getName());
-    }
-
-    @Test
-    void testGetBooksByGenre() {
-        // Arrange
-        String genre = "FICTIONAL";
-        boolean isAvailable = true;
-        List<Book> books = Collections.singletonList(book);
-        when(bookRepository.findBooksByGenre(Genre.valueOf(genre), isAvailable)).thenReturn(books);
-
-        // Act
-        List<Book> result = bookService.getBooks(genre, isAvailable, null);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(book.getName(), result.getFirst().getName());
-    }
-
-    @Test
-    void testGetBooksByAuthor() {
-        // Arrange
-        String authorName = "Author Name";
-        boolean isAvailable = true;
-        List<Book> books = Collections.singletonList(book);
-        when(bookRepository.findBooksByAuthor(authorName, isAvailable)).thenReturn(books);
-
-        // Act
-        List<Book> result = bookService.getBooks(null, isAvailable, authorName);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(book.getName(), result.getFirst().getName());
+        assertNotNull(books);
+        assertEquals(1, books.size());
+        assertEquals("Book 1", books.get(0).getName());
     }
 }

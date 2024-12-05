@@ -1,102 +1,157 @@
 package org.clx.library.controller;
 
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import org.clx.library.dto.AuthorDto;
-import org.clx.library.exception.AuthorNotFoundException;
+import org.clx.library.dto.AuthorRequest;
+import org.clx.library.exception.ResourceNotFoundException;
+
 import org.clx.library.services.AuthorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+@WebMvcTest(AuthorController.class) // Only test the AuthorController
 class AuthorControllerTest {
 
-    @Mock
-    private AuthorService authorService;
-
-    @InjectMocks
-    private AuthorController authorController;
-
+    @Autowired
     private MockMvc mockMvc;
+    @Mock
+    private Logger logger;
+    @MockBean
+    private AuthorService authorService; // Mock the AuthorService
 
+    private AuthorRequest authorRequest;
     private AuthorDto authorDto;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(authorController).build();
+        authorRequest = new AuthorRequest();
+        authorRequest.setName("John Doe");
+        authorRequest.setEmail("john.doe@example.com");
+        authorRequest.setCountry("USA");
 
-        // Initialize the AuthorDto object
         authorDto = new AuthorDto();
         authorDto.setId(1);
-        authorDto.setName("Author Name");
-        authorDto.setEmail("author@example.com");
-        authorDto.setAge(45);
-        authorDto.setCountry("Country");
+        authorDto.setName("John Doe");
+        authorDto.setEmail("john.doe@example.com");
+        authorDto.setCountry("USA");
     }
 
     @Test
-    void testCreateAuthor() throws Exception {
-        // Arrange
-        when(authorService.createAuthor(any(AuthorDto.class))).thenReturn(authorDto);
+    void testCreateAuthor_Success() throws Exception {
+        when(authorService.createAuthor(any(AuthorRequest.class))).thenReturn(authorRequest);
 
-        // Act & Assert
-        mockMvc.perform(post("/createAuthor")
+        mockMvc.perform(MockMvcRequestBuilders.post("/createAuthor")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"Author Name\", \"email\": \"author@example.com\", \"age\": 45, \"country\": \"Country\"}"))
+                        .content("{\"name\":\"John Doe\", \"email\":\"john.doe@example.com\", \"country\":\"USA\"}"))
                 .andExpect(status().isCreated())
-                .andExpect(content().string("Author created with ID: 1"));
+                .andExpect(jsonPath("$.message").value("Author created successfully"))
+                .andExpect(jsonPath("$.data").isEmpty());
+
+        verify(authorService, times(1)).createAuthor(any(AuthorRequest.class));
     }
 
     @Test
     void testUpdateAuthor_Success() throws Exception {
-        // Arrange
-        AuthorDto updatedAuthorDto = new AuthorDto();
-        updatedAuthorDto.setName("Updated Name");
-        updatedAuthorDto.setEmail("updated@example.com");
+        AuthorDto authorDto1 = new AuthorDto();
+        authorDto1.setId(1);
+        authorDto1.setName("John Doe");
+        authorDto1.setEmail("john.doe@example.com");
+        authorDto1.setCountry("USA");
 
-        when(authorService.updateAuthor(any(AuthorDto.class), eq(1))).thenReturn(updatedAuthorDto);
+        when(authorService.updateAuthor(any(AuthorRequest.class), eq(1))).thenReturn(authorRequest);
 
-        // Act & Assert
-        mockMvc.perform(put("/updateAuthor/{authorId}", 1)
+        mockMvc.perform(MockMvcRequestBuilders.put("/updateAuthor/{authorId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"Updated Name\", \"email\": \"updated@example.com\"}"))
+                        .content("{\"name\":\"John Doe\", \"email\":\"john.doe@example.com\", \"country\":\"USA\"}"))
                 .andExpect(status().isAccepted())
-                .andExpect(content().string("Author updated!!"));
+                .andExpect(jsonPath("$.message").value("Author updated successfully"))
+                .andExpect(jsonPath("$.data.name").value("John Doe"))
+                .andExpect(jsonPath("$.data.email").value("john.doe@example.com"))
+                .andExpect(jsonPath("$.data.country").value("USA"));
+
+        verify(authorService, times(1)).updateAuthor(any(AuthorRequest.class), eq(1));
     }
 
     @Test
-    void testUpdateAuthor_NotFound() throws Exception {
-        // Arrange
-        when(authorService.updateAuthor(any(AuthorDto.class), eq(1)))
-                .thenThrow(new AuthorNotFoundException("Author with ID 1 not found"));
+    void testUpdateAuthor_AuthorNotFound() throws Exception {
+        when(authorService.updateAuthor(any(AuthorRequest.class), eq(999))).thenThrow(new ResourceNotFoundException("Author", "id", 999));
 
-        // Act & Assert
-        mockMvc.perform(put("/updateAuthor/{authorId}", 1)
+        mockMvc.perform(MockMvcRequestBuilders.put("/updateAuthor/{authorId}", 999)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"Updated Name\"}"))
+                        .content("{\"name\":\"John Doe\", \"email\":\"john.doe@example.com\", \"country\":\"USA\"}"))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Author with ID 1 not found"));
+                .andExpect(jsonPath("$.message").value("Author not found"));
+
+        verify(authorService, times(1)).updateAuthor(any(AuthorRequest.class), eq(999));
+    }
+
+
+    @Test
+    void testDeleteAuthor_Error() throws Exception {
+        // Arrange
+        doThrow(new RuntimeException("Failed to delete author")).when(authorService).deleteAuthor(anyInt());
+
+        // Act and Assert
+        mockMvc.perform(MockMvcRequestBuilders.delete("/deleteAuthor/{id}", 1))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("failed"));
+
+        verify(authorService, times(1)).deleteAuthor((1));
     }
 
     @Test
-    void testDeleteAuthor() throws Exception {
-        // Arrange
-        doNothing().when(authorService).deleteAuthor(1);
+    void testDeleteAuthor_Success() throws Exception {
+        int authorId = 1;
 
-        // Act & Assert
-        mockMvc.perform(delete("/deleteAuthor/{id}", 1))
+        // Mock the service
+        doNothing().when(authorService).deleteAuthor(authorId);
+
+        // Perform the request
+        mockMvc.perform(delete("/deleteAuthor/{id}", authorId))
                 .andExpect(status().isNoContent())
-                .andExpect(content().string("Author deleted!!"));
+                .andDo(print());
 
-        // Verify that deleteAuthor method was called once
-        verify(authorService, times(1)).deleteAuthor(1);
+        // Verify the service method was called
+        verify(authorService, times(1)).deleteAuthor(authorId);
     }
+
+
+    @Test
+    void testFindAuthorById_Success() throws Exception {
+        when(authorService.findAuthorById(anyInt())).thenReturn(authorDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/findAuthor/{authorId}", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Author found successfully"))
+                .andExpect(jsonPath("$.data.id").value(1));
+
+        verify(authorService, times(1)).findAuthorById((1));
+    }
+
+    @Test
+    void testFindAuthorById_AuthorNotFound() throws Exception {
+        when(authorService.findAuthorById(anyInt())).thenThrow(new ResourceNotFoundException("Author", "id", 999));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/findAuthor/{authorId}", 999))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("failed"))
+                .andExpect(jsonPath("$.data").value("Author not found with id : 999"));
+
+        verify(authorService, times(1)).findAuthorById((999));
+    }
+
+
 }
