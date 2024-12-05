@@ -59,8 +59,6 @@ public class AuthorService {
             authorToUpdate.setCountry(authorRequest.getCountry());
             logger.info("Author country updated to: {}", authorRequest.getCountry());
         }
-
-
         Author updatedAuthor = authorRepository.save(authorToUpdate);
         logger.info("Author with ID: {} updated successfully", authorId);
 

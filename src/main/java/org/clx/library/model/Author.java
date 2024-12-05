@@ -27,7 +27,7 @@ public class Author {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Book> booksWritten;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Book> savedBook = new ArrayList<>();
 
 }
