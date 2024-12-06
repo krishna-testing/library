@@ -25,7 +25,7 @@ public class AuthorService {
                 .body(Mono.just(authorRequest), AuthorRequest.class)
                 .retrieve()
                 .bodyToMono(AuthorRequest.class)
-                .doOnSuccess(response -> logger.info("Author created with Name: {}", response.getName()))
+                .doOnSuccess(response -> logger.info("Author created successfully"))
                 .block();
     }
 
@@ -46,7 +46,7 @@ public class AuthorService {
                 .body(Mono.just(authorRequest), AuthorRequest.class)
                 .retrieve()
                 .bodyToMono(AuthorRequest.class)
-                .doOnSuccess(response -> logger.info("Author updated successfully: {}", response.getName()))
+                .doOnSuccess(response -> logger.info("Author updated successfully"))
                 .block();
     }
 
