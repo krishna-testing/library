@@ -3,7 +3,6 @@ package org.clx.library.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.clx.library.dto.BookDto;
 import org.clx.library.exception.ResourceNotFoundException;
-import org.clx.library.model.Book;
 import org.clx.library.payload.ApiResponse;
 import org.clx.library.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +66,7 @@ public class BookController {
         log.info("Received request to get books with parameters - Genre: {}, Available: {}, Author: {}", genre, isAvailable, author);
 
         try {
-            List<Book> books = bookService.getBooks(genre, isAvailable, author);
+            List<BookDto> books = bookService.getBooks(genre, isAvailable, author);
             log.info("Returning {} books", books.size());
             ApiResponse response = new ApiResponse(HttpStatus.OK, "Books retrieved successfully", books);
             return new ResponseEntity<>(response, HttpStatus.OK);
