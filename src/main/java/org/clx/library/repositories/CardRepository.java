@@ -10,14 +10,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CardRepository extends JpaRepository<Card,Integer> {
-
+public interface CardRepository extends JpaRepository<Card, Integer> {
 
     @Modifying
     @Transactional
     @Query("UPDATE Card c SET c.cardStatus = :status WHERE c.student.id = :studentId")
     void deactivateCard(@Param("studentId") int studentId, @Param("status") CardStatus status);
-
-
 
 }

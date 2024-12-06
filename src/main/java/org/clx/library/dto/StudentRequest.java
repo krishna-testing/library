@@ -27,7 +27,7 @@ public class StudentRequest {
     @NotBlank
     private String country;
 
-    public Student studentRequestToStudent(){
+    public Student studentRequestToStudent() {
         Student student = new Student();
         student.setEmailId(emailId);
         student.setName(name);

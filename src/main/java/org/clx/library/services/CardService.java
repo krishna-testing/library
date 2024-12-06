@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class CardService {
 
-
     private final CardRepository cardRepository;
-
 
     public Card createCard(Student student) {
         Card card = new Card();
