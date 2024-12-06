@@ -2,10 +2,7 @@ package org.clx.library.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.clx.library.exception.BookNotFoundException;
-import org.clx.library.exception.CardInvalidException;
-import org.clx.library.exception.CardNotFoundException;
-import org.clx.library.exception.MaxAllowedBooksException;
+import org.clx.library.exception.*;
 import org.clx.library.model.*;
 import org.clx.library.repositories.BookRepository;
 import org.clx.library.repositories.CardRepository;
@@ -36,13 +33,13 @@ public class TransactionService {
     int finePerDay;
 
 
-    public String issueBooks(int cardId,int bookId) throws BookNotFoundException, CardNotFoundException {
+    public String issueBooks(int cardId,int bookId) {
         log.info("Attempting to issue book with ID: {} to card ID: {}", bookId, cardId);
         // Use findById() and check if the book exists
         Optional<Book> optionalBook = bookRepository.findById(bookId);
         if (optionalBook.isEmpty()) {
             log.warn("Book with ID: {} not found!", bookId);
-            throw new BookNotFoundException("Book not found!!");
+            throw new ResourceNotFoundException("Book","id",bookId);
         }
 
         Book book = optionalBook.get(); // Now it's safe to use book
@@ -50,19 +47,19 @@ public class TransactionService {
         // Check if the book is available
         if (!book.getAvailable()) {  // Use getAvailable() instead of isAvailable()
             log.warn("Book with ID: {} is unavailable!", bookId);
-            throw new BookNotFoundException("Book is unavailable!");
+            throw new ResourceNotFoundException("Book","id",bookId);
         }
 
         // Check if the card exists and is valid
         Card card=cardRepository.findById(cardId)
                 .orElseThrow(()-> {
                     log.warn("Card with ID: {} not found!", cardId);
-                    return new CardNotFoundException("Card Not Found With id : "+cardId);
+                    return new ResourceNotFoundException("Card","id",cardId);
                 });
 
         if (card==null||card.getCardStatus()== CardStatus.DEACTIVATED){
             log.warn("Card with ID: {} is deactivated.", cardId);
-            throw new CardInvalidException("Card is invalid!!");
+            throw new ResourceNotFoundException("Card","id",cardId);
         }
 
         // Check if the card has reached its book limit
@@ -92,41 +89,62 @@ public class TransactionService {
         return transaction.getTransactionId();
     }
 
-    public String returnBooks(int cardId,int bookId)throws BookNotFoundException, CardNotFoundException{
+    public String returnBooks(int cardId, int bookId) {
         log.info("Attempting to return book with ID: {} for card ID: {}", bookId, cardId);
 
-        List<Transaction> transactions=transactionRepository.findByCard_Book(cardId,bookId,TransactionStatus.SUCCESSFUL,true);
-        Transaction lastIssueTransaction=transactions.get(transactions.size()-1);
-        //Last transaction that has been done
-        Date issueDate=lastIssueTransaction.getTransactionDate();
-        long issueTime=Math.abs(issueDate.getTime()-System.currentTimeMillis());
-        long numberOfDaysPassed= TimeUnit.DAYS.convert(issueTime,TimeUnit.MILLISECONDS);
-        int fine=0;
-        if (numberOfDaysPassed>maxDaysAllowed){
-            fine=(int)Math.abs(numberOfDaysPassed-maxDaysAllowed)*finePerDay;
+        // Validate if the card and book exist
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardId));
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResourceNotFoundException("Book", "id", bookId));
+
+        // Fetch active issue transactions for the given card and book
+        List<Transaction> transactions = transactionRepository.findByCard_Book(cardId, bookId, TransactionStatus.SUCCESSFUL, true);
+
+        // Check if no valid issue transactions exist
+        if (transactions.isEmpty()) {
+            log.error("No active issue transaction found for book ID: {} and card ID: {}. Cannot proceed with return.", bookId, cardId);
+            throw new IllegalArgumentException("Book with ID " + bookId + " was not issued to card ID " + cardId + ". Cannot return.");
+        }
+
+        // Get the last transaction
+        Transaction lastTransaction = transactions.get(transactions.size() - 1);
+
+        // Ensure the last transaction is an issue operation
+        if (Boolean.FALSE.equals(lastTransaction.getIsIssueOperation())) {
+            log.error("The last transaction for book ID: {} and card ID: {} is not an issue operation. Cannot return.", bookId, cardId);
+            throw new IllegalArgumentException("Book with ID " + bookId + " has already been returned. Cannot return again.");
+        }
+
+        // Calculate fine if the book is returned late
+        Date issueDate = lastTransaction.getTransactionDate();
+        long issueTime = Math.abs(issueDate.getTime() - System.currentTimeMillis());
+        long numberOfDaysPassed = TimeUnit.DAYS.convert(issueTime, TimeUnit.MILLISECONDS);
+        int fine = 0;
+        if (numberOfDaysPassed > maxDaysAllowed) {
+            fine = (int) (numberOfDaysPassed - maxDaysAllowed) * finePerDay;
             log.info("Late return detected. Days passed: {}, Fine: {}", numberOfDaysPassed, fine);
         }
-        Card card=lastIssueTransaction.getCard();
-        Book book=lastIssueTransaction.getBook();
-        book.setCard(null);
-        book.setAvailable(true);
-        bookRepository.updateBook(book);
+
+        // Update the book's availability
+        book.setCard(null);  // Remove the association with the card
+        book.setAvailable(true);  // Mark as available for the next borrower
+        bookRepository.save(book);  // Save the book update
         log.info("Book with ID: {} has been successfully returned and updated.", bookId);
 
-        // Create a return transaction
-        Transaction newTransaction=new Transaction();
+        // Create and save a new return transaction
+        Transaction newTransaction = new Transaction();
         newTransaction.setBook(book);
         newTransaction.setCard(card);
         newTransaction.setFineAmount(fine);
-        newTransaction.setIsIssueOperation(false);
+        newTransaction.setIsIssueOperation(false);  // Mark it as a return operation
         newTransaction.setTransactionStatus(TransactionStatus.SUCCESSFUL);
-        transactionRepository.save(newTransaction);
+        newTransaction.setTransactionDate(new Date());  // Set current date for the transaction
+        transactionRepository.save(newTransaction);  // Save the return transaction
+
         log.info("Return transaction successful. Transaction ID: {}", newTransaction.getTransactionId());
-        return newTransaction.getTransactionId();
+        return newTransaction.getTransactionId();  // Return the transaction ID
     }
-
-
-
 
 
 }

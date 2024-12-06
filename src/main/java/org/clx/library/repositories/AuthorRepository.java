@@ -16,8 +16,9 @@ public interface AuthorRepository extends JpaRepository<Author,Integer> {
             "a.country=:#{#new_author.country} where a.id=:#{#new_author.id}")
     int updateAuthorDetails(@Param("new_author") Author newAuthor);
 
-    @Modifying
-    @Query("delete Author a where a.id=:given_id")
-    int deleteCustom(@Param("given_id") int id);
+//    @Modifying
+//    @Query("delete Author a where a.id=:given_id")
+//    int deleteCustom(@Param("given_id") int id);
+//    int deleteCustom(int id);
 
 }
