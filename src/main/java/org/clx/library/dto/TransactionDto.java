@@ -36,25 +36,22 @@ public class TransactionDto {
 
     private Date transactionDate;
 
-    public Transaction transactionDtoToTransaction(){
+    public Transaction transactionDtoToTransaction() {
         Transaction transaction = new Transaction();
         transaction.setId(id);
         transaction.setTransactionId(transactionId);
         transaction.setFineAmount(fineAmount);
-//        transaction.setBook(bookDto.bookDtoToBook());
         transaction.setIsIssueOperation(isIssueOperation);
         transaction.setTransactionStatus(transactionStatus);
         transaction.setTransactionDate(transactionDate);
         return transaction;
     }
 
-    public static TransactionDto transactionToTransactionDto(Transaction transaction){
+    public static TransactionDto transactionToTransactionDto(Transaction transaction) {
         TransactionDto transactionDto = new TransactionDto();
         transactionDto.setId(transaction.getId());
         transactionDto.setTransactionId(transaction.getTransactionId());
         transactionDto.setFineAmount(transaction.getFineAmount());
-//        Book book = transaction.getBook();
-//        transactionDto.setBookDto(BookDto.bookToBookDto(book));
         transactionDto.setIsIssueOperation(transaction.getIsIssueOperation());
         transactionDto.setTransactionStatus(transaction.getTransactionStatus());
         transactionDto.setTransactionDate(transaction.getTransactionDate());

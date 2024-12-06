@@ -30,7 +30,7 @@ public class StudentDto {
     private Date updatedOn;
 
 
-    public Student studentDtoToStudent(){
+    public Student studentDtoToStudent() {
         Student student = new Student();
         student.setId(id);
         student.setEmailId(emailId);
@@ -43,7 +43,7 @@ public class StudentDto {
         return student;
     }
 
-    public StudentDto studentToStudentDto(Student student){
+    public StudentDto studentToStudentDto(Student student) {
         StudentDto studentDto = new StudentDto();
         studentDto.setId(student.getId());
         studentDto.setEmailId(student.getEmailId());

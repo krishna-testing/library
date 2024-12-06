@@ -32,7 +32,6 @@ public class TransactionService {
     @Value("${books.fine.per_day}")
     int finePerDay;
 
-
     public String issueBooks(int cardId,int bookId) {
         log.info("Attempting to issue book with ID: {} to card ID: {}", bookId, cardId);
         // Use findById() and check if the book exists
@@ -92,16 +91,13 @@ public class TransactionService {
     public String returnBooks(int cardId, int bookId) {
         log.info("Attempting to return book with ID: {} for card ID: {}", bookId, cardId);
 
-        // Validate if the card and book exist
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardId));
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Book", "id", bookId));
 
-        // Fetch active issue transactions for the given card and book
         List<Transaction> transactions = transactionRepository.findByCard_Book(cardId, bookId, TransactionStatus.SUCCESSFUL, true);
 
-        // Check if no valid issue transactions exist
         if (transactions.isEmpty()) {
             log.error("No active issue transaction found for book ID: {} and card ID: {}. Cannot proceed with return.", bookId, cardId);
             throw new IllegalArgumentException("Book with ID " + bookId + " was not issued to card ID " + cardId + ". Cannot return.");
@@ -127,9 +123,9 @@ public class TransactionService {
         }
 
         // Update the book's availability
-        book.setCard(null);  // Remove the association with the card
-        book.setAvailable(true);  // Mark as available for the next borrower
-        bookRepository.save(book);  // Save the book update
+        book.setCard(null);
+        book.setAvailable(true);
+        bookRepository.save(book);
         log.info("Book with ID: {} has been successfully returned and updated.", bookId);
 
         // Create and save a new return transaction
@@ -140,7 +136,7 @@ public class TransactionService {
         newTransaction.setIsIssueOperation(false);  // Mark it as a return operation
         newTransaction.setTransactionStatus(TransactionStatus.SUCCESSFUL);
         newTransaction.setTransactionDate(new Date());  // Set current date for the transaction
-        transactionRepository.save(newTransaction);  // Save the return transaction
+        transactionRepository.save(newTransaction);
 
         log.info("Return transaction successful. Transaction ID: {}", newTransaction.getTransactionId());
         return newTransaction.getTransactionId();  // Return the transaction ID

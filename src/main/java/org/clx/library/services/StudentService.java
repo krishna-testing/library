@@ -20,8 +20,6 @@ public class StudentService {
 
     private final WebClient webClient;
 
-
-
     public StudentRequest createStudent(StudentRequest studentRequest) {
         logger.info("sending request to create student");
         return webClient.post()
@@ -33,6 +31,7 @@ public class StudentService {
                 .block();
 
     }
+
     public StudentRequest updateStudent(StudentRequest studentRequest, Integer authorId) throws ResourceNotFoundException {
         logger.info("Sending request to update author with ID: {}", authorId);
         return webClient.put()

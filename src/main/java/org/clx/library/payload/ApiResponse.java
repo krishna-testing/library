@@ -16,12 +16,12 @@ public class ApiResponse {
     private Object data;
 
     public ApiResponse(HttpStatus httpStatus, String message, Object data) {
-        this.status=httpStatus.value();
-        this.message=message;
-        this.data=data;
+        this.status = httpStatus.value();
+        this.message = message;
+        this.data = data;
     }
 
-    public ResponseEntity<ApiResponse> create(){
+    public ResponseEntity<ApiResponse> create() {
 
         return new ResponseEntity<>(this, HttpStatus.valueOf(status));
     }

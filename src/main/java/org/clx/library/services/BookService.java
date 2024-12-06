@@ -39,7 +39,6 @@ public class BookService {
         Author author = this.authorRepository.findById(authorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author ", "Author id", authorId));
 
-
         Book book = this.modelMapper.map(bookDto, Book.class);
         book.setId(book.getId());
         book.setName(book.getName());
@@ -68,13 +67,11 @@ public class BookService {
         return "Book deleted successfully";
     }
 
-
     public BookDto findBookById(Integer bookId) {
         Book book = this.bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Book", "book id", bookId));
         return this.modelMapper.map(book, BookDto.class);
     }
-
 
     public BookDto updateBook(BookDto bookDto, int bookId) {
         Book book = this.bookRepository.findById(bookId)
@@ -85,7 +82,6 @@ public class BookService {
         Book updatedBook = this.bookRepository.save(book);
         return this.modelMapper.map(updatedBook, BookDto.class);
     }
-
 
     public BookResponse findAllBook(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
 

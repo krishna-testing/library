@@ -26,15 +26,15 @@ public class CardDto {
 
     private Date updatedOn;
 
-    @Enumerated(value=EnumType.STRING)
+    @Enumerated(value = EnumType.STRING)
     private CardStatus cardStatus;
 
     private List<TransactionDto> transactionDtoList;
 
     private List<BookDto> bookDtoList;
 
-    public Card cardDtoToCard(){
-        Card card= new Card();
+    public Card cardDtoToCard() {
+        Card card = new Card();
         card.setId(id);
         card.setCreatedOn(createdOn);
         card.setUpdatedOn(updatedOn);
@@ -51,7 +51,7 @@ public class CardDto {
         return card;
     }
 
-    public CardDto cardToCardDto(Card card){
+    public CardDto cardToCardDto(Card card) {
         CardDto cardDto = new CardDto();
         cardDto.setId(card.getId());
         cardDto.setCreatedOn(card.getCreatedOn());
@@ -65,11 +65,11 @@ public class CardDto {
                         .toList();
 
         cardDto.setTransactionDtoList(list);
-        List<BookDto> bookDtoList1 = card.getBooks()==null?
-                Collections.emptyList():
+        List<BookDto> bookDtoList1 = card.getBooks() == null ?
+                Collections.emptyList() :
                 card.getBooks().stream()
-                .map(BookDto::bookToBookDto)
-                .toList();
+                        .map(BookDto::bookToBookDto)
+                        .toList();
         cardDto.setBookDtoList(bookDtoList1);
         return cardDto;
     }

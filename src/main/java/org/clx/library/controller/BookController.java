@@ -42,7 +42,6 @@ public class BookController {
         }
     }
 
-
     @DeleteMapping("/deleteBook")
     public ResponseEntity<ApiResponse> deleteBook(@RequestParam Integer bookId, @RequestParam Integer authorId) {
         log.info("Received request to delete book with ID: {} for authorId: {}", bookId, authorId);
@@ -58,7 +57,6 @@ public class BookController {
         }
     }
 
-
     @GetMapping("/getBooks")
     public ResponseEntity<ApiResponse> getBooks(
             @RequestParam(required = false) String genre,
@@ -67,7 +65,7 @@ public class BookController {
         log.info("Received request to get books with parameters - Genre: {}, Available: {}, Author: {}", genre, isAvailable, author);
 
         try {
-            List<BookDto> books = bookService.getBooks(genre, isAvailable, author);
+            List<Book> books = bookService.getBooks(genre, isAvailable, author);
             log.info("Returning {} books", books.size());
             ApiResponse response = new ApiResponse(HttpStatus.OK, "Books retrieved successfully", books);
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -78,7 +76,6 @@ public class BookController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @GetMapping("/posts/{bookId}")
     public ResponseEntity<ApiResponse> getBookById(@PathVariable Integer bookId) {
