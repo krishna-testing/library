@@ -1,6 +1,5 @@
 package org.clx.library.exception;
 
-import org.clx.library.CommonUtil;
 import org.clx.library.payload.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

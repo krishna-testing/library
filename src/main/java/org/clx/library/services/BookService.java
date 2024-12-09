@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clx.library.dto.AuthorDto;
 import org.clx.library.dto.BookDto;
-import org.clx.library.dto.BookResponse;
+import org.clx.library.payload.BookResponse;
 
 import org.clx.library.exception.ResourceNotFoundException;
 import org.clx.library.exception.UnauthorizedBookDeletionException;
@@ -20,10 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Pageable;
-
 
 
 @Service
@@ -35,12 +34,10 @@ public class BookService {
     private final AuthorService authorService;
     private ModelMapper modelMapper;
 
-
     public BookDto createBook(BookDto bookDto, int authorId) {
 
         Author author = this.authorRepository.findById(authorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author ", "Author id", authorId));
-
 
 
         Book book = this.modelMapper.map(bookDto, Book.class);
@@ -79,32 +76,25 @@ public class BookService {
     }
 
 
-
     public BookDto updateBook(BookDto bookDto, int bookId) {
         Book book = this.bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("post", "POST_ID_FIELD", bookId));
-        book.setAuthor(bookDto.getAuthor());
         book.setName(bookDto.getName());
         book.setGenre(bookDto.getGenre());
-        book.setCard(bookDto.getCard());
         book.setCreatedAt(LocalDateTime.now());
         Book updatedBook = this.bookRepository.save(book);
         return this.modelMapper.map(updatedBook, BookDto.class);
     }
 
 
-
     public BookResponse findAllBook(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
-//		Sort sort =null;
+
         Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        /*
-         * if(sortDir.equalsIgnoreCase("asc")) { sort = Sort.by(sortBy).ascending();
-         * }else { sort = Sort.by(sortBy).descending(); }
-         */
+
         Pageable p = PageRequest.of(pageNumber, pageSize, sort /* Sort.by(sortBy).descending() */);
         Page<Book> pagePost = this.bookRepository.findAll(p);
         List<Book> allPosts = pagePost.getContent();
-        List<BookDto> postDtos = allPosts.stream().map((post) -> this.modelMapper.map(post, BookDto.class))
+        List<BookDto> postDtos = allPosts.stream().map(post -> this.modelMapper.map(post, BookDto.class))
                 .toList();
         BookResponse bookResponse = new BookResponse();
         bookResponse.setContent(postDtos);
@@ -131,7 +121,6 @@ public class BookService {
         }
         log.info("Fetching books based on availability: {}", isAvailable);
         return bookRepository.findBooksByAvailability(isAvailable);
-
     }
 
 }

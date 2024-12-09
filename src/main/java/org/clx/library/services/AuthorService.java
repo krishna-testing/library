@@ -3,7 +3,7 @@ package org.clx.library.services;
 import lombok.AllArgsConstructor;
 import org.clx.library.dto.AuthorDto;
 import org.clx.library.dto.AuthorRequest;
-import org.clx.library.exception.AuthorNotFoundException;
+import org.clx.library.exception.ResourceNotFoundException;
 import org.clx.library.model.Author;
 import org.clx.library.repositories.AuthorRepository;
 import org.slf4j.Logger;
@@ -19,101 +19,62 @@ public class AuthorService {
 
     private final AuthorRepository authorRepository;
 
-    // Map Author entity to AuthorDto
-    private AuthorDto mapToDto(Author author) {
-        AuthorDto authorDto = new AuthorDto();
-        authorDto.setId(author.getId());
-        authorDto.setName(author.getName());
-        authorDto.setEmail(author.getEmail());
-        authorDto.setAge(author.getAge());
-        authorDto.setCountry(author.getCountry());
-        authorDto.setBooksWritten(author.getBooksWritten());
-        authorDto.setSavedBook(author.getSavedBook());
-        return authorDto;
-    }
-
-    // Map AuthorDto to Author entity
-    private Author mapToEntity(AuthorDto authorDto) {
-        Author author = new Author();
-        author.setId(authorDto.getId());
-        author.setName(authorDto.getName());
-        author.setEmail(authorDto.getEmail());
-        author.setAge(authorDto.getAge());
-        author.setCountry(authorDto.getCountry());
-        author.setBooksWritten(authorDto.getBooksWritten());
-        author.setSavedBook(authorDto.getSavedBook());
-        return author;
-    }
 
     public AuthorRequest createAuthor(AuthorRequest authorRequest) {
-        // Convert DTO to entity
-//        Author author = mapToEntity(authorDto);
-        Author author = authorRequest.authorRequestToAuthor(authorRequest);
+
+        Author author = authorRequest.authorRequestToAuthor();
         Author savedAuthor = authorRepository.save(author);
         logger.info("Author created successfully with ID: {}", savedAuthor.getId());
 
         return authorRequest;
     }
 
-    public AuthorDto findAuthorById(Integer authorId) throws AuthorNotFoundException {
+    public AuthorDto findAuthorById(Integer authorId) throws ResourceNotFoundException {
         logger.info("Received request to find author with ID: {}", authorId);
-        Optional<Author> author = authorRepository.findById(authorId);
-        if (author.isPresent()) {
-            logger.info("Author with ID: {} found", authorId);
-            return mapToDto(author.get());
-        } else {
-            logger.error("Author with ID: {} not found", authorId);
-            throw new AuthorNotFoundException("User does not exist with userId: " + authorId);
-        }
+        Author author = authorRepository.findById(authorId).orElseThrow(() -> new ResourceNotFoundException("author", "id", authorId));
+        AuthorDto authorDto = new AuthorDto();
+        return authorDto.mapToDto(author);
     }
 
-    public AuthorDto updateAuthor(AuthorDto authorDto, Integer authorId) throws AuthorNotFoundException {
+    public AuthorRequest updateAuthor(AuthorRequest authorRequest, Integer authorId) throws ResourceNotFoundException {
         logger.info("Received request to update author with ID: {}", authorId);
         Optional<Author> existingAuthor = authorRepository.findById(authorId);
         if (existingAuthor.isEmpty()) {
             logger.error("Author with ID: {} not found. Cannot update.", authorId);
-            throw new AuthorNotFoundException("User does not exist with ID: " + authorId);
+            throw new ResourceNotFoundException("Author", "id", authorId);
         }
 
         Author authorToUpdate = existingAuthor.get();
 
         // Update fields from DTO if not null
-        if (authorDto.getName() != null) {
-            authorToUpdate.setName(authorDto.getName());
-            logger.info("Author name updated to: {}", authorDto.getName());
+        if (authorRequest.getName() != null) {
+            authorToUpdate.setName(authorRequest.getName());
+            logger.info("Author name updated to: {}", authorRequest.getName());
         }
-        if (authorDto.getEmail() != null) {
-            authorToUpdate.setEmail(authorDto.getEmail());
-            logger.info("Author email updated to: {}", authorDto.getEmail());
+        if (authorRequest.getEmail() != null) {
+            authorToUpdate.setEmail(authorRequest.getEmail());
+            logger.info("Author email updated to: {}", authorRequest.getEmail());
         }
-
+        if (authorRequest.getCountry() != null) {
+            authorToUpdate.setCountry(authorRequest.getCountry());
+            logger.info("Author country updated to: {}", authorRequest.getCountry());
+        }
         Author updatedAuthor = authorRepository.save(authorToUpdate);
         logger.info("Author with ID: {} updated successfully", authorId);
 
         // Return updated AuthorDto
-        return mapToDto(updatedAuthor);
+        return authorRequest.authorToAuthorRequest(updatedAuthor);
     }
 
-    public AuthorDto updateAuthor(AuthorDto authorDto) {
-        logger.info("Request is now received to update author: {}", authorDto);
-        try {
-            Author author = mapToEntity(authorDto);
-            authorRepository.updateAuthorDetails(author);
-            logger.info("Author details updated successfully for author: {}", authorDto);
-            return authorDto; // Assuming the input DTO is sufficient
-        } catch (Exception e) {
-            logger.error("Error occurred while updating author details: {}", e.getMessage(), e);
-            return null;
-        }
-    }
+
 
     public void deleteAuthor(int id) {
         logger.info("Received request to delete author with ID: {}", id);
-        try {
-            authorRepository.deleteCustom(id);
-            logger.info("Author with ID: {} deleted successfully", id);
-        } catch (Exception e) {
-            logger.error("Error occurred while deleting author with ID: {}: {}", id, e.getMessage(), e);
-        }
+        Author author = authorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("author", "id", id));
+        authorRepository.deleteById(id);
+        logger.info("Author with ID: {} deleted successfully", author.getId());
     }
+
 }
+
+

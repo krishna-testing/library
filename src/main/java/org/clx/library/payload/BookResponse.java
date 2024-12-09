@@ -1,4 +1,4 @@
-package org.clx.library.dto;
+package org.clx.library.payload;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.clx.library.dto.BookDto;
 
 @Getter
 @Setter
