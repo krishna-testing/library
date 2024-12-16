@@ -41,7 +41,6 @@ public class BookController {
         }
     }
 
-
     @DeleteMapping("/deleteBook")
     public ResponseEntity<ApiResponse> deleteBook(@RequestParam Integer bookId, @RequestParam Integer authorId) {
         log.info("Received request to delete book with ID: {} for authorId: {}", bookId, authorId);
@@ -56,7 +55,6 @@ public class BookController {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
-
 
     @GetMapping("/getBooks")
     public ResponseEntity<ApiResponse> getBooks(
@@ -77,7 +75,6 @@ public class BookController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @GetMapping("/posts/{bookId}")
     public ResponseEntity<ApiResponse> getBookById(@PathVariable Integer bookId) {

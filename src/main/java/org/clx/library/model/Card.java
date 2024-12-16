@@ -17,16 +17,12 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 public class Card {
-
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-
     @JsonIgnore
-    @OneToOne(mappedBy = "card",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "card", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Student student;
 
     @CreationTimestamp
@@ -35,16 +31,14 @@ public class Card {
     @UpdateTimestamp
     private Date updatedOn;
 
-    @Enumerated(value=EnumType.STRING)
+    @Enumerated(value = EnumType.STRING)
     private CardStatus cardStatus;
 
-    @OneToMany(mappedBy = "card",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Transaction> transactions;
 
-    @OneToMany(mappedBy = "card",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Book> books;
-
-
 
     public Card() {
         this.cardStatus = CardStatus.ACTIVATED;

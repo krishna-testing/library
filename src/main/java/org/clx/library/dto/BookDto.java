@@ -29,10 +29,6 @@ public class BookDto {
         book.setName(name);
         book.setGenre(genre);
         book.setAvailable(available);
-//        List<Transaction> transactionList = transactions.stream()
-//                .map(TransactionDto::transactionDtoToTransaction)
-//                .toList();
-//        book.setTransactions(transactionList);
         return book;
     }
 
@@ -41,11 +37,6 @@ public class BookDto {
         bookDto.setId(book.getId());
         bookDto.setName(book.getName());
         bookDto.setGenre(book.getGenre());
-//        List<TransactionDto> transactionDtoList = book.getTransactions() == null ?
-//                Collections.emptyList() :
-//                book.getTransactions().stream().map(TransactionDto::transactionToTransactionDto).toList();
-//        bookDto.setTransactions(transactionDtoList);
-
         return bookDto;
     }
 }
